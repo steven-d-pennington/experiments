@@ -39,7 +39,7 @@ const LiquidGravity: React.FC = () => {
       color: randomColor(),
     }));
     function animate() {
-      if (!running) return;
+      if (!running || !ctx) return;
       ctx.clearRect(0, 0, WIDTH, HEIGHT);
       for (const p of particles) {
         p.vy += 0.1; // gravity
