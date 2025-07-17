@@ -225,7 +225,7 @@ const OctagonBounce: React.FC = () => {
           let nx = (local.x - cx) / distToCenter;
           let ny = (local.y - cy) / distToCenter;
           // Wall tangential velocity (due to rotation)
-          const wallOmega = 0.01; // radians/frame, matches angle increment
+          const wallOmega = spinSpeed; // use the actual spin speed
           const wallTangential = wallOmega * edgeDist;
           // Tangent vector (perpendicular to normal)
           const tx = -ny;
