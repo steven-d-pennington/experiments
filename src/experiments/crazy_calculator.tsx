@@ -52,7 +52,6 @@ const CrazyCalculator: React.FC = () => {
     }
     if (val === '=') {
       try {
-        // eslint-disable-next-line no-eval
         let result = eval(expr.replace(/[^0-9+\-*/.]/g, ''));
         if (Math.random() < 0.2) {
           randomEffect();

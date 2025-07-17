@@ -34,7 +34,7 @@ const GravityBallsGame: React.FC = () => {
   const [ballCount, setBallCount] = useState(0);
   const [gravityStatus, setGravityStatus] = useState('Gravity: ON');
   const gravity = 0.5;
-  let animationId: number;
+  const animationId = useRef<number>();
 
   // Ball physics and animation
   useEffect(() => {
@@ -146,14 +146,13 @@ const GravityBallsGame: React.FC = () => {
       }
       // Draw all balls
       frameBalls.forEach(drawBall);
-      animationId = requestAnimationFrame(animate);
+      animationId.current = requestAnimationFrame(animate);
     }
     animate();
     return () => {
       running = false;
-      cancelAnimationFrame(animationId);
+      if (animationId.current) cancelAnimationFrame(animationId.current);
     };
-    // eslint-disable-next-line
   }, [balls, gravityEnabled]);
 
   // Update stats

@@ -11,11 +11,12 @@ const MotorcycleGame: React.FC = () => {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    let running = true;
+    const running = true;
     let x = 100, y = HEIGHT - 40, vx = 0, vy = 0, angle = 0, onGround = true;
-    let keys: Record<string, boolean> = {};
-    let ground = Array.from({ length: WIDTH }, (_, i) => HEIGHT - 40 - Math.sin(i/60) * 20);
+    const keys: Record<string, boolean> = {};
+    const ground = Array.from({ length: WIDTH }, (_, i) => HEIGHT - 40 - Math.sin(i/60) * 20);
     function drawBike() {
+      if (!ctx) return;
       ctx.save();
       ctx.translate(x, y);
       ctx.rotate(angle);
@@ -30,6 +31,7 @@ const MotorcycleGame: React.FC = () => {
     }
     function animate() {
       if (!running) return;
+      if (!ctx) return;
       ctx.clearRect(0, 0, WIDTH, HEIGHT);
       // Draw ground
       ctx.beginPath();
@@ -51,7 +53,7 @@ const MotorcycleGame: React.FC = () => {
       vy += 0.5;
       y += vy;
       // Ground collision
-      let groundY = ground[Math.round(x)] || HEIGHT - 40;
+      const groundY = ground[Math.round(x)] || HEIGHT - 40;
       if (y > groundY) {
         y = groundY;
         vy = 0;
@@ -75,7 +77,6 @@ const MotorcycleGame: React.FC = () => {
     window.addEventListener('keydown', onKey);
     window.addEventListener('keyup', onKey);
     return () => {
-      running = false;
       window.removeEventListener('keydown', onKey);
       window.removeEventListener('keyup', onKey);
     };

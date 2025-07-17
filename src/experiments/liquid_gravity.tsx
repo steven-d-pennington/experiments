@@ -39,7 +39,8 @@ const LiquidGravity: React.FC = () => {
         if (p.y < p.r) { p.y = p.r; p.vy *= -0.7; }
       }
       // draw
-      for (let p of particles) {
+      for (const p of particles) {
+        if (!ctx) continue;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fillStyle = p.color;
@@ -50,9 +51,10 @@ const LiquidGravity: React.FC = () => {
       // connect close particles
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
-          let a = particles[i], b = particles[j];
-          let dx = a.x - b.x, dy = a.y - b.y;
-          let dist = Math.sqrt(dx*dx + dy*dy);
+          if (!ctx) continue;
+          const a = particles[i], b = particles[j];
+          const dx = a.x - b.x, dy = a.y - b.y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
           if (dist < 60) {
             ctx.beginPath();
             ctx.moveTo(a.x, a.y);
@@ -82,12 +84,14 @@ const LiquidGravity: React.FC = () => {
           const y = e.clientY - rect.top;
           // Add a splash of new particles
           for (let i = 0; i < 10; i++) {
-            let angle = Math.random() * Math.PI * 2;
-            let speed = 4 + Math.random() * 2;
-            let vx = Math.cos(angle) * speed;
-            let vy = Math.sin(angle) * speed;
-            (canvasRef.current as any).particles = (canvasRef.current as any).particles || [];
-            (canvasRef.current as any).particles.push({ x, y, vx, vy, r: 8 + Math.random() * 8, color: randomColor() });
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 4 + Math.random() * 2;
+            const vx = Math.cos(angle) * speed;
+            const vy = Math.sin(angle) * speed;
+            // Type-safe way to store particles on the canvas element
+            const canvasEl = canvasRef.current as HTMLCanvasElement & { particles?: any[] };
+            canvasEl.particles = canvasEl.particles || [];
+            canvasEl.particles.push({ x, y, vx, vy, r: 8 + Math.random() * 8, color: randomColor() });
           }
         }}
       />

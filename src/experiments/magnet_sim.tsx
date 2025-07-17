@@ -14,7 +14,7 @@ const MagnetSim: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     let running = true;
-    let particles = Array.from({ length: PARTICLE_COUNT }, () => ({
+    const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
       x: Math.random() * WIDTH,
       y: Math.random() * HEIGHT,
       vx: (Math.random() - 0.5) * 2,
@@ -24,6 +24,7 @@ const MagnetSim: React.FC = () => {
     }));
     function animate() {
       if (!running) return;
+      if (!ctx) return;
       ctx.clearRect(0, 0, WIDTH, HEIGHT);
       // Magnet
       ctx.beginPath();
@@ -36,12 +37,13 @@ const MagnetSim: React.FC = () => {
       ctx.lineWidth = 3;
       ctx.stroke();
       // Particles
-      for (let p of particles) {
+      for (const p of particles) {
+        if (!ctx) continue;
         // Magnetic force
-        let dx = magnet.x - p.x, dy = magnet.y - p.y;
-        let dist = Math.sqrt(dx*dx + dy*dy);
+        const dx = magnet.x - p.x, dy = magnet.y - p.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
         if (dist < 200) {
-          let force = 2000 / (dist * dist + 100);
+          const force = 2000 / (dist * dist + 100);
           p.vx += force * dx / dist;
           p.vy += force * dy / dist;
         }
@@ -55,7 +57,8 @@ const MagnetSim: React.FC = () => {
         if (p.y > HEIGHT - p.r) { p.y = HEIGHT - p.r; p.vy *= -0.7; p.vx *= 0.98; }
         if (p.y < p.r) { p.y = p.r; p.vy *= -0.7; }
       }
-      for (let p of particles) {
+      for (const p of particles) {
+        if (!ctx) continue;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fillStyle = p.color;
@@ -74,6 +77,7 @@ const MagnetSim: React.FC = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     function onDown(e: MouseEvent) {
+      if (!canvas) return;
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
@@ -82,6 +86,7 @@ const MagnetSim: React.FC = () => {
       }
     }
     function onMove(e: MouseEvent) {
+      if (!canvas) return;
       if (!magnet.dragging) return;
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;

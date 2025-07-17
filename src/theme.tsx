@@ -74,7 +74,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   useEffect(() => {
     // Only run on client
-    let stored = localStorage.getItem(THEME_STORAGE_KEY);
+    const stored = localStorage.getItem(THEME_STORAGE_KEY);
     if (stored) {
       setThemeId(stored);
     } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
