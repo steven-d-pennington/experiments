@@ -38,7 +38,6 @@ const MagnetSim: React.FC = () => {
       ctx.stroke();
       // Particles
       for (const p of particles) {
-        if (!ctx) continue;
         // Magnetic force
         const dx = magnet.x - p.x, dy = magnet.y - p.y;
         const dist = Math.sqrt(dx*dx + dy*dy);
@@ -58,7 +57,6 @@ const MagnetSim: React.FC = () => {
         if (p.y < p.r) { p.y = p.r; p.vy *= -0.7; }
       }
       for (const p of particles) {
-        if (!ctx) continue;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fillStyle = p.color;

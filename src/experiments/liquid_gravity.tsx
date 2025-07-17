@@ -8,6 +8,19 @@ function randomColor() {
   return `hsl(${Math.random()*360}, 80%, 60%)`;
 }
 
+// Define a type for the canvas with particles
+interface Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  r: number;
+  color: string;
+}
+interface CanvasWithParticles extends HTMLCanvasElement {
+  particles?: Particle[];
+}
+
 const LiquidGravity: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -17,7 +30,7 @@ const LiquidGravity: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     let running = true;
-    let particles = Array.from({ length: PARTICLE_COUNT }, () => ({
+    const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
       x: Math.random() * WIDTH,
       y: Math.random() * HEIGHT,
       vx: (Math.random() - 0.5) * 2,
@@ -28,7 +41,7 @@ const LiquidGravity: React.FC = () => {
     function animate() {
       if (!running) return;
       ctx.clearRect(0, 0, WIDTH, HEIGHT);
-      for (let p of particles) {
+      for (const p of particles) {
         p.vy += 0.1; // gravity
         p.x += p.vx;
         p.y += p.vy;
@@ -88,8 +101,7 @@ const LiquidGravity: React.FC = () => {
             const speed = 4 + Math.random() * 2;
             const vx = Math.cos(angle) * speed;
             const vy = Math.sin(angle) * speed;
-            // Type-safe way to store particles on the canvas element
-            const canvasEl = canvasRef.current as HTMLCanvasElement & { particles?: any[] };
+            const canvasEl = canvasRef.current as CanvasWithParticles;
             canvasEl.particles = canvasEl.particles || [];
             canvasEl.particles.push({ x, y, vx, vy, r: 8 + Math.random() * 8, color: randomColor() });
           }

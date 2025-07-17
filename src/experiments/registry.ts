@@ -13,7 +13,7 @@ export interface ExperimentMeta {
 }
 
 export interface ExperimentRegistryItem extends ExperimentMeta {
-  component: () => Promise<{ default: ComponentType<unknown> }>;
+  component: () => Promise<{ default: ComponentType<{}> }>;
 }
 
 export const experiments: ExperimentRegistryItem[] = [
