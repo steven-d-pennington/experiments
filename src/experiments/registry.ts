@@ -72,6 +72,17 @@ export const experiments: ExperimentRegistryItem[] = [
     fullPath: '/experiments/motorcycle-game',
     component: () => import('./motorcycle_game'),
   },
+  {
+    id: 'octagon-bounce',
+    title: 'Octagon Bounce',
+    description: 'Balls bounce inside a spinning octagon boundary. Minimal, robust demo.',
+    author: 'AI',
+    created: '2024-07-17',
+    tags: ['physics', 'canvas', 'octagon', 'minimal'],
+    thumbnailUrl: '/thumbnails/octagon-bounce.png',
+    fullPath: '/experiments/octagon-bounce',
+    component: () => import('./octagon_bounce'),
+  },
 ];
 
 export function getExperimentById(id: string) {
