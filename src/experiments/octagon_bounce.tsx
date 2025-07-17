@@ -8,36 +8,6 @@ const OCTAGON_RADIUS = WIDTH * 0.45;
 const BALL_COUNT = 20;
 const WALL_DRAG_FACTOR = 0.7; // 0 = no drag, 1 = full wall tangential velocity transfer
 
-function getOctagonVertices(cx: number, cy: number, radius: number, angle: number) {
-  const verts = [];
-  for (let i = 0; i < OCTAGON_SIDES; i++) {
-    const theta = angle + (Math.PI * 2 * i) / OCTAGON_SIDES;
-    verts.push({
-      x: cx + Math.cos(theta) * radius,
-      y: cy + Math.sin(theta) * radius,
-    });
-  }
-  return verts;
-}
-
-function pointToEdgeDistance(px: number, py: number, verts: {x: number, y: number}[]) {
-  let minDist = Infinity;
-  for (let i = 0; i < verts.length; i++) {
-    const a = verts[i];
-    const b = verts[(i + 1) % verts.length];
-    const ex = b.x - a.x;
-    const ey = b.y - a.y;
-    const nx = ey;
-    const ny = -ex;
-    const apx = px - a.x;
-    const apy = py - a.y;
-    const edgeLen = Math.sqrt(ex*ex + ey*ey);
-    const dist = (apx * nx + apy * ny) / edgeLen;
-    if (dist < minDist) minDist = dist;
-  }
-  return minDist;
-}
-
 function rotatePoint(x: number, y: number, cx: number, cy: number, angle: number) {
   const dx = x - cx;
   const dy = y - cy;
@@ -81,7 +51,6 @@ const OctagonBounce: React.FC = () => {
   const balls = useRef<Ball[]>([]);
   const angleRef = useRef(0);
   const [spinSpeed, setSpinSpeed] = useState(0.01);
-  const [_, setRerender] = useState(0); // for UI update after adding balls
 
   function addBall() {
     const cx = WIDTH / 2;
@@ -111,7 +80,8 @@ const OctagonBounce: React.FC = () => {
           r: 12,
           color: `hsl(${Math.random()*360},80%,60%)`,
         });
-        setRerender(x => x + 1); // force UI update
+        // force UI update
+        setSpinSpeed(s => s);
         break;
       }
       tries++;
@@ -120,7 +90,7 @@ const OctagonBounce: React.FC = () => {
 
   function resetBalls() {
     balls.current = [];
-    setRerender(x => x + 1);
+    setSpinSpeed(s => s); // force UI update
   }
 
   useEffect(() => {
@@ -213,17 +183,14 @@ const OctagonBounce: React.FC = () => {
         b.x += b.vx;
         b.y += b.vy;
         // Transform to local frame
-        const dx = b.x - cx;
-        const dy = b.y - cy;
         const local = rotatePoint(b.x, b.y, cx, cy, -angle);
         const theta = Math.atan2(local.y - cy, local.x - cx);
         const distToCenter = Math.sqrt((local.x - cx) ** 2 + (local.y - cy) ** 2);
         const edgeDist = polygonEdgeDistance(OCTAGON_RADIUS, OCTAGON_SIDES, theta);
         if (distToCenter + b.r > edgeDist) {
           // Ball is outside, reflect velocity
-          // Normal is from center to ball in local frame
-          let nx = (local.x - cx) / distToCenter;
-          let ny = (local.y - cy) / distToCenter;
+          const nx = (local.x - cx) / distToCenter;
+          const ny = (local.y - cy) / distToCenter;
           // Wall tangential velocity (due to rotation)
           const wallOmega = spinSpeed; // use the actual spin speed
           const wallTangential = wallOmega * edgeDist;
