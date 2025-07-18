@@ -14,14 +14,14 @@ interface Ball {
   color: string;
 }
 
-interface Magnet {
+interface GravityWell {
   x: number;
   y: number;
   dragging: boolean;
   strength: number;
 }
 
-const MagnetSim: React.FC = () => {
+const GravityWellSim: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [balls, setBalls] = useState<Ball[]>(() => {
     const arr: Ball[] = [];
@@ -56,14 +56,14 @@ const MagnetSim: React.FC = () => {
     }
     return arr;
   });
-  const [magnets, setMagnets] = useState<Magnet[]>([
+  const [wells, setWells] = useState<GravityWell[]>([
     { x: WIDTH / 2, y: HEIGHT / 2, dragging: false, strength: 1 },
   ]);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
 
-  function addMagnet() {
-    setMagnets(mags => [
-      ...mags,
+  function addWell() {
+    setWells(ws => [
+      ...ws,
       { x: WIDTH / 2 + Math.random() * 100 - 50, y: HEIGHT / 2 + Math.random() * 100 - 50, dragging: false, strength: 1 },
     ]);
   }
@@ -106,8 +106,8 @@ const MagnetSim: React.FC = () => {
     });
   }
 
-  function setMagnetStrength(idx: number, value: number) {
-    setMagnets(mags => mags.map((m, i) => i === idx ? { ...m, strength: value } : m));
+  function setWellStrength(idx: number, value: number) {
+    setWells(ws => ws.map((w, i) => i === idx ? { ...w, strength: value } : w));
   }
 
   useEffect(() => {
@@ -120,15 +120,15 @@ const MagnetSim: React.FC = () => {
       if (!running) return;
       if (!ctx) return;
       ctx.clearRect(0, 0, WIDTH, HEIGHT);
-      // Draw all magnets
-      for (const mag of magnets) {
+      // Draw all gravity wells
+      for (const well of wells) {
         ctx.beginPath();
-        ctx.arc(mag.x, mag.y, MAGNET_RADIUS, 0, Math.PI * 2);
-        ctx.fillStyle = '#ff5252';
+        ctx.arc(well.x, well.y, MAGNET_RADIUS, 0, Math.PI * 2);
+        ctx.fillStyle = '#2563eb';
         ctx.globalAlpha = 0.7;
         ctx.fill();
         ctx.globalAlpha = 1;
-        ctx.strokeStyle = '#222';
+        ctx.strokeStyle = '#111';
         ctx.lineWidth = 3;
         ctx.stroke();
         // Draw strength label
@@ -136,7 +136,7 @@ const MagnetSim: React.FC = () => {
         ctx.fillStyle = '#fff';
         ctx.globalAlpha = 0.9;
         ctx.textAlign = 'center';
-        ctx.fillText(mag.strength.toFixed(2), mag.x, mag.y + 5);
+        ctx.fillText(well.strength.toFixed(2), well.x, well.y + 5);
         ctx.globalAlpha = 1;
       }
       // --- Ball-Ball Collisions ---
@@ -173,12 +173,12 @@ const MagnetSim: React.FC = () => {
       }
       // Particles
       for (const p of balls) {
-        // Magnetic force from all magnets
-        for (const mag of magnets) {
-          const dx = mag.x - p.x, dy = mag.y - p.y;
+        // Gravitational force from all wells
+        for (const well of wells) {
+          const dx = well.x - p.x, dy = well.y - p.y;
           const dist = Math.sqrt(dx*dx + dy*dy);
           if (dist < 200) {
-            const force = 2000 * mag.strength / (dist * dist + 100);
+            const force = 2000 * well.strength / (dist * dist + 100);
             p.vx += force * dx / dist;
             p.vy += force * dy / dist;
           }
@@ -205,9 +205,9 @@ const MagnetSim: React.FC = () => {
     }
     animate();
     return () => { running = false; };
-  }, [magnets, balls]);
+  }, [wells, balls]);
 
-  // Drag logic for multiple magnets
+  // Drag logic for multiple wells
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -216,12 +216,12 @@ const MagnetSim: React.FC = () => {
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      // Find the topmost magnet under the cursor
-      for (let i = magnets.length - 1; i >= 0; i--) {
-        const mag = magnets[i];
-        if (Math.sqrt((x - mag.x) ** 2 + (y - mag.y) ** 2) < MAGNET_RADIUS + 6) {
+      // Find the topmost well under the cursor
+      for (let i = wells.length - 1; i >= 0; i--) {
+        const well = wells[i];
+        if (Math.sqrt((x - well.x) ** 2 + (y - well.y) ** 2) < MAGNET_RADIUS + 6) {
           setDragIndex(i);
-          setMagnets(mags => mags.map((m, idx) => idx === i ? { ...m, dragging: true } : m));
+          setWells(ws => ws.map((w, idx) => idx === i ? { ...w, dragging: true } : w));
           break;
         }
       }
@@ -232,10 +232,10 @@ const MagnetSim: React.FC = () => {
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      setMagnets(mags => mags.map((m, idx) => idx === dragIndex && m.dragging ? { ...m, x, y } : m));
+      setWells(ws => ws.map((w, idx) => idx === dragIndex && w.dragging ? { ...w, x, y } : w));
     }
     function onUp() {
-      setMagnets(mags => mags.map(m => ({ ...m, dragging: false })));
+      setWells(ws => ws.map(w => ({ ...w, dragging: false })));
       setDragIndex(null);
     }
     canvas.addEventListener('mousedown', onDown);
@@ -246,30 +246,30 @@ const MagnetSim: React.FC = () => {
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('mouseup', onUp);
     };
-  }, [magnets, dragIndex]);
+  }, [wells, dragIndex]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <h1>🧲 Magnet Simulation</h1>
-      <p style={{ color: 'var(--color-text-secondary)' }}>Drag any red magnet to move the particles! Add more magnets for more fun.</p>
+      <h1>🪐 Gravity Well Simulation</h1>
+      <p style={{ color: 'var(--color-text-secondary)' }}>Drag any blue gravity well to move the balls! Add more wells for more fun.</p>
       <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
-        <button onClick={addMagnet} style={{ padding: '8px 18px', fontSize: 16, borderRadius: 8, background: '#ff5252', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600 }}>Add Magnet</button>
-        <button onClick={addBall} style={{ padding: '8px 18px', fontSize: 16, borderRadius: 8, background: '#2563eb', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600 }}>Add Ball</button>
+        <button onClick={addWell} style={{ padding: '8px 18px', fontSize: 16, borderRadius: 8, background: '#2563eb', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600 }}>Add Gravity Well</button>
+        <button onClick={addBall} style={{ padding: '8px 18px', fontSize: 16, borderRadius: 8, background: '#ff5252', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600 }}>Add Ball</button>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8, width: 320 }}>
-        {magnets.map((mag, idx) => (
-          <label key={idx} style={{ color: '#ff5252', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, background: '#fff2', borderRadius: 8, padding: '4px 12px' }}>
-            Magnet {idx + 1} Strength
+        {wells.map((well, idx) => (
+          <label key={idx} style={{ color: '#2563eb', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, background: '#fff2', borderRadius: 8, padding: '4px 12px' }}>
+            Gravity Well {idx + 1} Strength
             <input
               type="range"
               min="0.1"
               max="2"
               step="0.01"
-              value={mag.strength}
-              onChange={e => setMagnetStrength(idx, Number(e.target.value))}
-              style={{ flex: 1, accentColor: '#ff5252' }}
+              value={well.strength}
+              onChange={e => setWellStrength(idx, Number(e.target.value))}
+              style={{ flex: 1, accentColor: '#2563eb' }}
             />
-            <span style={{ minWidth: 40, textAlign: 'right', color: '#222', fontWeight: 700 }}>{mag.strength.toFixed(2)}</span>
+            <span style={{ minWidth: 40, textAlign: 'right', color: '#222', fontWeight: 700 }}>{well.strength.toFixed(2)}</span>
           </label>
         ))}
       </div>
@@ -278,4 +278,4 @@ const MagnetSim: React.FC = () => {
   );
 };
 
-export default MagnetSim; 
+export default GravityWellSim; 
