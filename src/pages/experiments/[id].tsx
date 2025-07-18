@@ -26,11 +26,13 @@ const ExperimentPage: React.FC = () => {
   return (
     <ErrorBoundary>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 24 }}>
-        <VoteButtons experimentId={experiment.id} />
       </div>
       <Suspense fallback={<div>Loading experiment...</div>}>
         <LazyExperiment />
       </Suspense>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '32px 0 0 0' }}>
+        <VoteButtons experimentId={experiment.id} />
+      </div>
       <div style={{ marginTop: 24, textAlign: 'center' }}>
         <button onClick={() => router.push('/')}>← Back to Gallery</button>
       </div>
