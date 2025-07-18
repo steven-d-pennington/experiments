@@ -23,8 +23,6 @@ const PlanetarySim: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [planets, setPlanets] = useState<Planet[]>([]);
   const [sunMass, setSunMass] = useState(SUN_STRENGTH_DEFAULT);
-  const [collisionCount, setCollisionCount] = useState(0);
-  const prevCollisionsRef = useRef<Set<string>>(new Set());
 
   // Sun is fixed at center
   const sun = { x: WIDTH / 2, y: HEIGHT / 2, strength: sunMass };
@@ -58,7 +56,6 @@ const PlanetarySim: React.FC = () => {
 
   function resetPlanets() {
     setPlanets([]);
-    setCollisionCount(0);
   }
 
   useEffect(() => {
@@ -68,9 +65,6 @@ const PlanetarySim: React.FC = () => {
     if (!ctx) return;
     let running = true;
     let frame = 0;
-    const prevCollisions = prevCollisionsRef.current;
-    const newCollisions = new Set<string>();
-    let newCollisionEvents = 0;
     function animate() {
       if (!running || !ctx) return;
       ctx.clearRect(0, 0, WIDTH, HEIGHT);
@@ -115,7 +109,7 @@ const PlanetarySim: React.FC = () => {
       ctx.font = 'bold 15px sans-serif';
       ctx.fillStyle = '#ffb300';
       ctx.globalAlpha = 0.85;
-      ctx.fillText(`Sun Mass: ${sun.strength.toFixed(2)}`, sun.x, sun.y + SUN_RADIUS + 24);
+      ctx.fillText(`Sun Mass: ${sunMass.toFixed(2)}`, sun.x, sun.y + SUN_RADIUS + 24);
       ctx.globalAlpha = 1;
       // --- Ball-Ball Collisions ---
       for (let i = 0; i < planets.length; i++) {
@@ -126,46 +120,30 @@ const PlanetarySim: React.FC = () => {
           const dy = b.y - a.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           const minDist = a.r + b.r;
-          const pairKey = [a.id, b.id].sort().join(',');
           const isColliding = dist < minDist && dist > 0;
           if (isColliding) {
-            newCollisions.add(pairKey);
-            if (!prevCollisions.has(pairKey)) {
-              newCollisionEvents++;
-              // Move balls apart with extra buffer
-              const overlap = 0.5 * (minDist - dist + 1.5); // more robust separation
-              const nx = dx / dist;
-              const ny = dy / dist;
-              a.x -= nx * overlap;
-              a.y -= ny * overlap;
-              b.x += nx * overlap;
-              b.y += ny * overlap;
-              // Elastic collision (equal mass)
-              const dvx = b.vx - a.vx;
-              const dvy = b.vy - a.vy;
-              const dot = dvx * nx + dvy * ny;
-              if (dot < 0) {
-                const impulse = dot;
-                a.vx += nx * impulse;
-                a.vy += ny * impulse;
-                b.vx -= nx * impulse;
-                b.vy -= ny * impulse;
-              }
-            } else {
-              // Already colliding, just separate
-              const overlap = 0.5 * (minDist - dist + 1.5);
-              const nx = dx / dist;
-              const ny = dy / dist;
-              a.x -= nx * overlap;
-              a.y -= ny * overlap;
-              b.x += nx * overlap;
-              b.y += ny * overlap;
+            // Move balls apart with extra buffer
+            const overlap = 0.5 * (minDist - dist + 1.5); // more robust separation
+            const nx = dx / dist;
+            const ny = dy / dist;
+            a.x -= nx * overlap;
+            a.y -= ny * overlap;
+            b.x += nx * overlap;
+            b.y += ny * overlap;
+            // Elastic collision (equal mass)
+            const dvx = b.vx - a.vx;
+            const dvy = b.vy - a.vy;
+            const dot = dvx * nx + dvy * ny;
+            if (dot < 0) {
+              const impulse = dot;
+              a.vx += nx * impulse;
+              a.vy += ny * impulse;
+              b.vx -= nx * impulse;
+              b.vy -= ny * impulse;
             }
           }
         }
       }
-      prevCollisionsRef.current = newCollisions;
-      if (newCollisionEvents > 0) setCollisionCount(c => c + newCollisionEvents);
       // Planets
       for (const p of planets) {
         // Gravitational force from sun
@@ -184,7 +162,7 @@ const PlanetarySim: React.FC = () => {
       }
       // Draw orbits (trails)
       ctx.save();
-      ctx.globalAlpha = 0.18;
+      ctx.globalAlpha = 0.10;
       for (const p of planets) {
         ctx.beginPath();
         ctx.arc(sun.x, sun.y, Math.sqrt((p.x - sun.x) ** 2 + (p.y - sun.y) ** 2), 0, Math.PI * 2);
@@ -219,7 +197,6 @@ const PlanetarySim: React.FC = () => {
         <button onClick={addPlanet} style={{ padding: '10px 28px', fontSize: 18, borderRadius: 8, background: '#2563eb', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, boxShadow: '0 2px 8px #2563eb33' }}>Add Planet</button>
         <button onClick={resetPlanets} style={{ padding: '10px 28px', fontSize: 18, borderRadius: 8, background: '#222', color: '#ffb300', border: '2px solid #ffb300', cursor: 'pointer', fontWeight: 700 }}>Reset</button>
         <span style={{ color: '#fff', fontSize: 17, marginLeft: 8 }}>Planets: <b style={{ color: '#ffb300' }}>{planets.length}</b></span>
-        <span style={{ color: '#fff', fontSize: 17, marginLeft: 8 }}>Collisions: <b style={{ color: '#ff5252' }}>{collisionCount}</b></span>
         <label style={{ color: '#ffb300', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, background: '#fff2', borderRadius: 8, padding: '4px 12px', marginLeft: 8 }}>
           Sun Mass
           <input
@@ -233,6 +210,10 @@ const PlanetarySim: React.FC = () => {
           />
           <span style={{ minWidth: 40, textAlign: 'right', color: '#222', fontWeight: 700 }}>{sunMass.toFixed(2)}</span>
         </label>
+      </div>
+      <div style={{ color: '#fff', fontSize: 15, marginBottom: 8, opacity: 0.7, display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
+        <span><span style={{ display: 'inline-block', width: 18, height: 18, borderRadius: 9, background: 'hsl(200,80%,60%)', marginRight: 6, verticalAlign: 'middle' }}></span>Typical planet color</span>
+        <span><span style={{ display: 'inline-block', width: 18, height: 18, borderRadius: 9, background: 'hsl(50,80%,60%)', marginRight: 6, verticalAlign: 'middle' }}></span>Another planet color</span>
       </div>
       <div style={{ width: '100%', maxWidth: WIDTH, aspectRatio: '1 / 1', background: 'transparent', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 16px rgba(0,0,0,0.12)' }}>
         <canvas ref={canvasRef} width={WIDTH} height={HEIGHT} style={{ width: '100%', height: '100%', background: '#181825', borderRadius: 16, display: 'block' }} />
