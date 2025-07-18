@@ -54,6 +54,7 @@ const PlanetarySim: React.FC = () => {
 
   function resetPlanets() {
     setPlanets([]);
+    setCollisionCount(0);
   }
 
   useEffect(() => {
@@ -122,29 +123,39 @@ const PlanetarySim: React.FC = () => {
           const dist = Math.sqrt(dx * dx + dy * dy);
           const minDist = a.r + b.r;
           const pairKey = `${i},${j}`;
-          if (dist < minDist && dist > 0) {
+          const isColliding = dist < minDist && dist > 0;
+          if (isColliding) {
             newCollisions.add(pairKey);
             if (!prevCollisions.has(pairKey)) {
               newCollisionEvents++;
-            }
-            // Move balls apart
-            const overlap = 0.5 * (minDist - dist + 0.1);
-            const nx = dx / dist;
-            const ny = dy / dist;
-            a.x -= nx * overlap;
-            a.y -= ny * overlap;
-            b.x += nx * overlap;
-            b.y += ny * overlap;
-            // Elastic collision (equal mass)
-            const dvx = b.vx - a.vx;
-            const dvy = b.vy - a.vy;
-            const dot = dvx * nx + dvy * ny;
-            if (dot < 0) {
-              const impulse = dot;
-              a.vx += nx * impulse;
-              a.vy += ny * impulse;
-              b.vx -= nx * impulse;
-              b.vy -= ny * impulse;
+              // Move balls apart with extra buffer
+              const overlap = 0.5 * (minDist - dist + 1.5); // more robust separation
+              const nx = dx / dist;
+              const ny = dy / dist;
+              a.x -= nx * overlap;
+              a.y -= ny * overlap;
+              b.x += nx * overlap;
+              b.y += ny * overlap;
+              // Elastic collision (equal mass)
+              const dvx = b.vx - a.vx;
+              const dvy = b.vy - a.vy;
+              const dot = dvx * nx + dvy * ny;
+              if (dot < 0) {
+                const impulse = dot;
+                a.vx += nx * impulse;
+                a.vy += ny * impulse;
+                b.vx -= nx * impulse;
+                b.vy -= ny * impulse;
+              }
+            } else {
+              // Already colliding, just separate
+              const overlap = 0.5 * (minDist - dist + 1.5);
+              const nx = dx / dist;
+              const ny = dy / dist;
+              a.x -= nx * overlap;
+              a.y -= ny * overlap;
+              b.x += nx * overlap;
+              b.y += ny * overlap;
             }
           }
         }
