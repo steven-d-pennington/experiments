@@ -3,10 +3,28 @@ import React, { useRef, useEffect, useState } from 'react';
 const WIDTH = 600;
 const HEIGHT = 400;
 const PARTICLE_COUNT = 60;
+const MAGNET_RADIUS = 24;
+
+interface Magnet {
+  x: number;
+  y: number;
+  dragging: boolean;
+}
 
 const MagnetSim: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [magnet, setMagnet] = useState({ x: WIDTH / 2, y: HEIGHT / 2, dragging: false });
+  const [magnets, setMagnets] = useState<Magnet[]>([
+    { x: WIDTH / 2, y: HEIGHT / 2, dragging: false },
+  ]);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+
+  // Add Magnet button handler
+  function addMagnet() {
+    setMagnets(mags => [
+      ...mags,
+      { x: WIDTH / 2 + Math.random() * 100 - 50, y: HEIGHT / 2 + Math.random() * 100 - 50, dragging: false },
+    ]);
+  }
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -26,25 +44,29 @@ const MagnetSim: React.FC = () => {
       if (!running) return;
       if (!ctx) return;
       ctx.clearRect(0, 0, WIDTH, HEIGHT);
-      // Magnet
-      ctx.beginPath();
-      ctx.arc(magnet.x, magnet.y, 24, 0, Math.PI * 2);
-      ctx.fillStyle = '#ff5252';
-      ctx.globalAlpha = 0.7;
-      ctx.fill();
-      ctx.globalAlpha = 1;
-      ctx.strokeStyle = '#222';
-      ctx.lineWidth = 3;
-      ctx.stroke();
+      // Draw all magnets
+      for (const mag of magnets) {
+        ctx.beginPath();
+        ctx.arc(mag.x, mag.y, MAGNET_RADIUS, 0, Math.PI * 2);
+        ctx.fillStyle = '#ff5252';
+        ctx.globalAlpha = 0.7;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.strokeStyle = '#222';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+      }
       // Particles
       for (const p of particles) {
-        // Magnetic force
-        const dx = magnet.x - p.x, dy = magnet.y - p.y;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist < 200) {
-          const force = 2000 / (dist * dist + 100);
-          p.vx += force * dx / dist;
-          p.vy += force * dy / dist;
+        // Magnetic force from all magnets
+        for (const mag of magnets) {
+          const dx = mag.x - p.x, dy = mag.y - p.y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist < 200) {
+            const force = 2000 / (dist * dist + 100);
+            p.vx += force * dx / dist;
+            p.vy += force * dy / dist;
+          }
         }
         p.x += p.vx;
         p.y += p.vy;
@@ -68,9 +90,9 @@ const MagnetSim: React.FC = () => {
     }
     animate();
     return () => { running = false; };
-  }, [magnet.x, magnet.y]);
+  }, [magnets]);
 
-  // Drag logic
+  // Drag logic for multiple magnets
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -79,20 +101,27 @@ const MagnetSim: React.FC = () => {
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      if (Math.sqrt((x - magnet.x) ** 2 + (y - magnet.y) ** 2) < 30) {
-        setMagnet(m => ({ ...m, dragging: true }));
+      // Find the topmost magnet under the cursor
+      for (let i = magnets.length - 1; i >= 0; i--) {
+        const mag = magnets[i];
+        if (Math.sqrt((x - mag.x) ** 2 + (y - mag.y) ** 2) < MAGNET_RADIUS + 6) {
+          setDragIndex(i);
+          setMagnets(mags => mags.map((m, idx) => idx === i ? { ...m, dragging: true } : m));
+          break;
+        }
       }
     }
     function onMove(e: MouseEvent) {
       if (!canvas) return;
-      if (!magnet.dragging) return;
+      if (dragIndex === null) return;
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      setMagnet(m => ({ ...m, x, y }));
+      setMagnets(mags => mags.map((m, idx) => idx === dragIndex && m.dragging ? { ...m, x, y } : m));
     }
     function onUp() {
-      setMagnet(m => ({ ...m, dragging: false }));
+      setMagnets(mags => mags.map(m => ({ ...m, dragging: false })));
+      setDragIndex(null);
     }
     canvas.addEventListener('mousedown', onDown);
     window.addEventListener('mousemove', onMove);
@@ -102,12 +131,13 @@ const MagnetSim: React.FC = () => {
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('mouseup', onUp);
     };
-  }, [magnet.dragging, magnet.x, magnet.y]);
+  }, [magnets, dragIndex]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <h1>🧲 Magnet Simulation</h1>
-      <p style={{ color: 'var(--color-text-secondary)' }}>Drag the red magnet to move the particles!</p>
+      <p style={{ color: 'var(--color-text-secondary)' }}>Drag any red magnet to move the particles! Add more magnets for more fun.</p>
+      <button onClick={addMagnet} style={{ marginBottom: 12, padding: '8px 18px', fontSize: 16, borderRadius: 8, background: '#ff5252', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600 }}>Add Magnet</button>
       <canvas ref={canvasRef} width={WIDTH} height={HEIGHT} style={{ borderRadius: 16, background: 'var(--color-surface)', boxShadow: '0 2px 16px rgba(0,0,0,0.08)', margin: 16 }} />
     </div>
   );
