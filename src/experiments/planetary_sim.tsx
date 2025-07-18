@@ -187,12 +187,12 @@ const PlanetarySim: React.FC = () => {
     }
     animate();
     return () => { running = false; };
-  }, [planets, sunMass]);
+  }, [planets, sunMass, sun.x, sun.y]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
       <h1 style={{ color: '#ffb300', fontWeight: 700, fontSize: 32, margin: '24px 0 8px 0', letterSpacing: 1 }}>Planetary Simulation</h1>
-      <div style={{ color: '#fff', fontSize: 16, marginBottom: 8, opacity: 0.8 }}>Click 'Add Planet' to spawn a planet in a stable orbit. Try adding several and watch the orbits!</div>
+      <div style={{ color: '#fff', fontSize: 16, marginBottom: 8, opacity: 0.8 }}>Click &apos;Add Planet&apos; to spawn a planet in a stable orbit. Try adding several and watch the orbits!</div>
       <div style={{ display: 'flex', gap: 16, marginBottom: 16, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
         <button onClick={addPlanet} style={{ padding: '10px 28px', fontSize: 18, borderRadius: 8, background: '#2563eb', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, boxShadow: '0 2px 8px #2563eb33' }}>Add Planet</button>
         <button onClick={resetPlanets} style={{ padding: '10px 28px', fontSize: 18, borderRadius: 8, background: '#222', color: '#ffb300', border: '2px solid #ffb300', cursor: 'pointer', fontWeight: 700 }}>Reset</button>

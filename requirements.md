@@ -1,0 +1,1 @@
+- All text content in React components must escape special characters (such as apostrophes) properly to avoid build errors. 
