@@ -49,6 +49,10 @@ const PlanetarySim: React.FC = () => {
     ]);
   }
 
+  function resetPlanets() {
+    setPlanets([]);
+  }
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -156,7 +160,10 @@ const PlanetarySim: React.FC = () => {
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
       <h1 style={{ color: '#ffb300', fontWeight: 700, fontSize: 32, margin: '24px 0 8px 0', letterSpacing: 1 }}>Planetary Simulation</h1>
       <div style={{ color: '#fff', fontSize: 16, marginBottom: 8, opacity: 0.8 }}>Click 'Add Planet' to spawn a planet in a stable orbit. Try adding several and watch the orbits!</div>
-      <button onClick={addPlanet} style={{ marginBottom: 16, padding: '10px 28px', fontSize: 18, borderRadius: 8, background: '#2563eb', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, boxShadow: '0 2px 8px #2563eb33' }}>Add Planet</button>
+      <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
+        <button onClick={addPlanet} style={{ padding: '10px 28px', fontSize: 18, borderRadius: 8, background: '#2563eb', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, boxShadow: '0 2px 8px #2563eb33' }}>Add Planet</button>
+        <button onClick={resetPlanets} style={{ padding: '10px 28px', fontSize: 18, borderRadius: 8, background: '#222', color: '#ffb300', border: '2px solid #ffb300', cursor: 'pointer', fontWeight: 700 }}>Reset</button>
+      </div>
       <div style={{ width: '100%', maxWidth: WIDTH, aspectRatio: '1 / 1', background: 'transparent', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 16px rgba(0,0,0,0.12)' }}>
         <canvas ref={canvasRef} width={WIDTH} height={HEIGHT} style={{ width: '100%', height: '100%', background: '#181825', borderRadius: 16, display: 'block' }} />
       </div>
