@@ -20,6 +20,8 @@ const PlanetarySim: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [planets, setPlanets] = useState<Planet[]>([]);
   const [sunMass, setSunMass] = useState(SUN_STRENGTH_DEFAULT);
+  const [collisionCount, setCollisionCount] = useState(0);
+  const prevCollisionsRef = useRef<Set<string>>(new Set());
 
   // Sun is fixed at center
   const sun = { x: WIDTH / 2, y: HEIGHT / 2, strength: sunMass };
@@ -61,6 +63,9 @@ const PlanetarySim: React.FC = () => {
     if (!ctx) return;
     let running = true;
     let frame = 0;
+    const prevCollisions = prevCollisionsRef.current;
+    const newCollisions = new Set<string>();
+    let newCollisionEvents = 0;
     function animate() {
       if (!running || !ctx) return;
       ctx.clearRect(0, 0, WIDTH, HEIGHT);
@@ -116,7 +121,12 @@ const PlanetarySim: React.FC = () => {
           const dy = b.y - a.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           const minDist = a.r + b.r;
+          const pairKey = `${i},${j}`;
           if (dist < minDist && dist > 0) {
+            newCollisions.add(pairKey);
+            if (!prevCollisions.has(pairKey)) {
+              newCollisionEvents++;
+            }
             // Move balls apart
             const overlap = 0.5 * (minDist - dist + 0.1);
             const nx = dx / dist;
@@ -139,6 +149,8 @@ const PlanetarySim: React.FC = () => {
           }
         }
       }
+      prevCollisionsRef.current = newCollisions;
+      if (newCollisionEvents > 0) setCollisionCount(c => c + newCollisionEvents);
       // Planets
       for (const p of planets) {
         // Gravitational force from sun
@@ -192,6 +204,7 @@ const PlanetarySim: React.FC = () => {
         <button onClick={addPlanet} style={{ padding: '10px 28px', fontSize: 18, borderRadius: 8, background: '#2563eb', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, boxShadow: '0 2px 8px #2563eb33' }}>Add Planet</button>
         <button onClick={resetPlanets} style={{ padding: '10px 28px', fontSize: 18, borderRadius: 8, background: '#222', color: '#ffb300', border: '2px solid #ffb300', cursor: 'pointer', fontWeight: 700 }}>Reset</button>
         <span style={{ color: '#fff', fontSize: 17, marginLeft: 8 }}>Planets: <b style={{ color: '#ffb300' }}>{planets.length}</b></span>
+        <span style={{ color: '#fff', fontSize: 17, marginLeft: 8 }}>Collisions: <b style={{ color: '#ff5252' }}>{collisionCount}</b></span>
         <label style={{ color: '#ffb300', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, background: '#fff2', borderRadius: 8, padding: '4px 12px', marginLeft: 8 }}>
           Sun Mass
           <input
