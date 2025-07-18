@@ -83,6 +83,17 @@ export const experiments: ExperimentRegistryItem[] = [
     fullPath: '/experiments/octagon-bounce',
     component: () => import('./octagon_bounce'),
   },
+  {
+    id: 'planetary-sim',
+    title: 'Planetary Simulation',
+    description: 'Simulate planets orbiting a sun. Add planets and watch stable orbits!',
+    author: 'AI',
+    created: '2024-07-17',
+    tags: ['physics', 'canvas', 'gravity', 'orbit', 'solar system'],
+    thumbnailUrl: '/thumbnails/planetary-sim.png',
+    fullPath: '/experiments/planetary-sim',
+    component: () => import('./planetary_sim'),
+  },
 ];
 
 export function getExperimentById(id: string) {
