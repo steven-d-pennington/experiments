@@ -59,16 +59,37 @@ const PlanetarySim: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     let running = true;
+    let frame = 0;
     function animate() {
       if (!running || !ctx) return;
       ctx.clearRect(0, 0, WIDTH, HEIGHT);
+      // Draw subtle background grid
+      ctx.save();
+      ctx.globalAlpha = 0.08;
+      ctx.strokeStyle = '#fff';
+      for (let x = 0; x < WIDTH; x += 50) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, HEIGHT);
+        ctx.stroke();
+      }
+      for (let y = 0; y < HEIGHT; y += 50) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(WIDTH, y);
+        ctx.stroke();
+      }
+      ctx.restore();
+      // Animate sun glow
+      frame++;
+      const sunGlow = 32 + 8 * Math.sin(frame * 0.04);
       // Draw sun
       ctx.beginPath();
       ctx.arc(sun.x, sun.y, SUN_RADIUS, 0, Math.PI * 2);
       ctx.fillStyle = '#ffb300';
       ctx.globalAlpha = 0.95;
       ctx.shadowColor = '#ffb30088';
-      ctx.shadowBlur = 32;
+      ctx.shadowBlur = sunGlow;
       ctx.fill();
       ctx.globalAlpha = 1;
       ctx.shadowBlur = 0;
@@ -79,6 +100,12 @@ const PlanetarySim: React.FC = () => {
       ctx.fillStyle = '#fff';
       ctx.textAlign = 'center';
       ctx.fillText('☉', sun.x, sun.y + 8);
+      // Sun mass label
+      ctx.font = 'bold 15px sans-serif';
+      ctx.fillStyle = '#ffb300';
+      ctx.globalAlpha = 0.85;
+      ctx.fillText(`Sun Mass: ${sun.strength.toFixed(2)}`, sun.x, sun.y + SUN_RADIUS + 24);
+      ctx.globalAlpha = 1;
       // --- Ball-Ball Collisions ---
       for (let i = 0; i < planets.length; i++) {
         for (let j = i + 1; j < planets.length; j++) {
@@ -160,9 +187,10 @@ const PlanetarySim: React.FC = () => {
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
       <h1 style={{ color: '#ffb300', fontWeight: 700, fontSize: 32, margin: '24px 0 8px 0', letterSpacing: 1 }}>Planetary Simulation</h1>
       <div style={{ color: '#fff', fontSize: 16, marginBottom: 8, opacity: 0.8 }}>Click 'Add Planet' to spawn a planet in a stable orbit. Try adding several and watch the orbits!</div>
-      <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
+      <div style={{ display: 'flex', gap: 16, marginBottom: 16, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
         <button onClick={addPlanet} style={{ padding: '10px 28px', fontSize: 18, borderRadius: 8, background: '#2563eb', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, boxShadow: '0 2px 8px #2563eb33' }}>Add Planet</button>
         <button onClick={resetPlanets} style={{ padding: '10px 28px', fontSize: 18, borderRadius: 8, background: '#222', color: '#ffb300', border: '2px solid #ffb300', cursor: 'pointer', fontWeight: 700 }}>Reset</button>
+        <span style={{ color: '#fff', fontSize: 17, marginLeft: 8 }}>Planets: <b style={{ color: '#ffb300' }}>{planets.length}</b></span>
       </div>
       <div style={{ width: '100%', maxWidth: WIDTH, aspectRatio: '1 / 1', background: 'transparent', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 16px rgba(0,0,0,0.12)' }}>
         <canvas ref={canvasRef} width={WIDTH} height={HEIGHT} style={{ width: '100%', height: '100%', background: '#181825', borderRadius: 16, display: 'block' }} />
