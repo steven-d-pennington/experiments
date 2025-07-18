@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 
 const WIDTH = 600;
 const HEIGHT = 400;
-const PARTICLE_COUNT = 60;
+const PARTICLE_COUNT = 8;
 const MAGNET_RADIUS = 24;
 
 interface Magnet {
@@ -67,6 +67,38 @@ const MagnetSim: React.FC = () => {
         ctx.textAlign = 'center';
         ctx.fillText(mag.strength.toFixed(2), mag.x, mag.y + 5);
         ctx.globalAlpha = 1;
+      }
+      // --- Ball-Ball Collisions ---
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const a = particles[i];
+          const b = particles[j];
+          const dx = b.x - a.x;
+          const dy = b.y - a.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const minDist = a.r + b.r;
+          if (dist < minDist && dist > 0) {
+            // Move balls apart
+            const overlap = 0.5 * (minDist - dist + 0.1);
+            const nx = dx / dist;
+            const ny = dy / dist;
+            a.x -= nx * overlap;
+            a.y -= ny * overlap;
+            b.x += nx * overlap;
+            b.y += ny * overlap;
+            // Elastic collision (equal mass)
+            const dvx = b.vx - a.vx;
+            const dvy = b.vy - a.vy;
+            const dot = dvx * nx + dvy * ny;
+            if (dot < 0) {
+              const impulse = dot;
+              a.vx += nx * impulse;
+              a.vy += ny * impulse;
+              b.vx -= nx * impulse;
+              b.vy -= ny * impulse;
+            }
+          }
+        }
       }
       // Particles
       for (const p of particles) {
