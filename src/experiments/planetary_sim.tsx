@@ -162,7 +162,7 @@ const PlanetarySim: React.FC = () => {
       }
       // Draw orbits (trails)
       ctx.save();
-      ctx.globalAlpha = 0.10;
+      ctx.globalAlpha = 0.28;
       for (const p of planets) {
         ctx.beginPath();
         ctx.arc(sun.x, sun.y, Math.sqrt((p.x - sun.x) ** 2 + (p.y - sun.y) ** 2), 0, Math.PI * 2);
@@ -210,10 +210,6 @@ const PlanetarySim: React.FC = () => {
           />
           <span style={{ minWidth: 40, textAlign: 'right', color: '#222', fontWeight: 700 }}>{sunMass.toFixed(2)}</span>
         </label>
-      </div>
-      <div style={{ color: '#fff', fontSize: 15, marginBottom: 8, opacity: 0.7, display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
-        <span><span style={{ display: 'inline-block', width: 18, height: 18, borderRadius: 9, background: 'hsl(200,80%,60%)', marginRight: 6, verticalAlign: 'middle' }}></span>Typical planet color</span>
-        <span><span style={{ display: 'inline-block', width: 18, height: 18, borderRadius: 9, background: 'hsl(50,80%,60%)', marginRight: 6, verticalAlign: 'middle' }}></span>Another planet color</span>
       </div>
       <div style={{ width: '100%', maxWidth: WIDTH, aspectRatio: '1 / 1', background: 'transparent', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 16px rgba(0,0,0,0.12)' }}>
         <canvas ref={canvasRef} width={WIDTH} height={HEIGHT} style={{ width: '100%', height: '100%', background: '#181825', borderRadius: 16, display: 'block' }} />
