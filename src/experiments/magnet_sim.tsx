@@ -9,12 +9,13 @@ interface Magnet {
   x: number;
   y: number;
   dragging: boolean;
+  strength: number;
 }
 
 const MagnetSim: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [magnets, setMagnets] = useState<Magnet[]>([
-    { x: WIDTH / 2, y: HEIGHT / 2, dragging: false },
+    { x: WIDTH / 2, y: HEIGHT / 2, dragging: false, strength: 1 },
   ]);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
 
@@ -22,8 +23,12 @@ const MagnetSim: React.FC = () => {
   function addMagnet() {
     setMagnets(mags => [
       ...mags,
-      { x: WIDTH / 2 + Math.random() * 100 - 50, y: HEIGHT / 2 + Math.random() * 100 - 50, dragging: false },
+      { x: WIDTH / 2 + Math.random() * 100 - 50, y: HEIGHT / 2 + Math.random() * 100 - 50, dragging: false, strength: 1 },
     ]);
+  }
+
+  function setMagnetStrength(idx: number, value: number) {
+    setMagnets(mags => mags.map((m, i) => i === idx ? { ...m, strength: value } : m));
   }
 
   useEffect(() => {
@@ -55,6 +60,13 @@ const MagnetSim: React.FC = () => {
         ctx.strokeStyle = '#222';
         ctx.lineWidth = 3;
         ctx.stroke();
+        // Draw strength label
+        ctx.font = 'bold 15px sans-serif';
+        ctx.fillStyle = '#fff';
+        ctx.globalAlpha = 0.9;
+        ctx.textAlign = 'center';
+        ctx.fillText(mag.strength.toFixed(2), mag.x, mag.y + 5);
+        ctx.globalAlpha = 1;
       }
       // Particles
       for (const p of particles) {
@@ -63,7 +75,7 @@ const MagnetSim: React.FC = () => {
           const dx = mag.x - p.x, dy = mag.y - p.y;
           const dist = Math.sqrt(dx*dx + dy*dy);
           if (dist < 200) {
-            const force = 2000 / (dist * dist + 100);
+            const force = 2000 * mag.strength / (dist * dist + 100);
             p.vx += force * dx / dist;
             p.vy += force * dy / dist;
           }
@@ -138,6 +150,23 @@ const MagnetSim: React.FC = () => {
       <h1>🧲 Magnet Simulation</h1>
       <p style={{ color: 'var(--color-text-secondary)' }}>Drag any red magnet to move the particles! Add more magnets for more fun.</p>
       <button onClick={addMagnet} style={{ marginBottom: 12, padding: '8px 18px', fontSize: 16, borderRadius: 8, background: '#ff5252', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600 }}>Add Magnet</button>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8, width: 320 }}>
+        {magnets.map((mag, idx) => (
+          <label key={idx} style={{ color: '#ff5252', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, background: '#fff2', borderRadius: 8, padding: '4px 12px' }}>
+            Magnet {idx + 1} Strength
+            <input
+              type="range"
+              min="0.1"
+              max="2"
+              step="0.01"
+              value={mag.strength}
+              onChange={e => setMagnetStrength(idx, Number(e.target.value))}
+              style={{ flex: 1, accentColor: '#ff5252' }}
+            />
+            <span style={{ minWidth: 40, textAlign: 'right', color: '#222', fontWeight: 700 }}>{mag.strength.toFixed(2)}</span>
+          </label>
+        ))}
+      </div>
       <canvas ref={canvasRef} width={WIDTH} height={HEIGHT} style={{ borderRadius: 16, background: 'var(--color-surface)', boxShadow: '0 2px 16px rgba(0,0,0,0.08)', margin: 16 }} />
     </div>
   );
