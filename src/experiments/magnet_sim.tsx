@@ -5,6 +5,15 @@ const HEIGHT = 400;
 const PARTICLE_COUNT = 8;
 const MAGNET_RADIUS = 24;
 
+interface Ball {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  r: number;
+  color: string;
+}
+
 interface Magnet {
   x: number;
   y: number;
@@ -14,17 +23,87 @@ interface Magnet {
 
 const MagnetSim: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [balls, setBalls] = useState<Ball[]>(() => {
+    const arr: Ball[] = [];
+    const cx = WIDTH / 2;
+    const cy = HEIGHT / 2;
+    let tries = 0;
+    while (arr.length < PARTICLE_COUNT && tries < PARTICLE_COUNT * 10) {
+      const theta = Math.random() * Math.PI * 2;
+      const rad = Math.random() * (Math.min(WIDTH, HEIGHT) / 2 - 30);
+      const x = cx + Math.cos(theta) * rad;
+      const y = cy + Math.sin(theta) * rad;
+      let overlap = false;
+      for (const b of arr) {
+        const dx = b.x - x;
+        const dy = b.y - y;
+        if (Math.sqrt(dx*dx + dy*dy) < b.r + 12) {
+          overlap = true;
+          break;
+        }
+      }
+      if (!overlap) {
+        arr.push({
+          x,
+          y,
+          vx: (Math.random() - 0.5) * 4,
+          vy: (Math.random() - 0.5) * 4,
+          r: 12,
+          color: `hsl(${Math.random()*360},80%,60%)`,
+        });
+      }
+      tries++;
+    }
+    return arr;
+  });
   const [magnets, setMagnets] = useState<Magnet[]>([
     { x: WIDTH / 2, y: HEIGHT / 2, dragging: false, strength: 1 },
   ]);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
 
-  // Add Magnet button handler
   function addMagnet() {
     setMagnets(mags => [
       ...mags,
       { x: WIDTH / 2 + Math.random() * 100 - 50, y: HEIGHT / 2 + Math.random() * 100 - 50, dragging: false, strength: 1 },
     ]);
+  }
+
+  function addBall() {
+    setBalls(balls => {
+      const cx = WIDTH / 2;
+      const cy = HEIGHT / 2;
+      let tries = 0;
+      while (tries < 100) {
+        const theta = Math.random() * Math.PI * 2;
+        const rad = Math.random() * (Math.min(WIDTH, HEIGHT) / 2 - 30);
+        const x = cx + Math.cos(theta) * rad;
+        const y = cy + Math.sin(theta) * rad;
+        let overlap = false;
+        for (const b of balls) {
+          const dx = b.x - x;
+          const dy = b.y - y;
+          if (Math.sqrt(dx*dx + dy*dy) < b.r + 12) {
+            overlap = true;
+            break;
+          }
+        }
+        if (!overlap) {
+          return [
+            ...balls,
+            {
+              x,
+              y,
+              vx: (Math.random() - 0.5) * 4,
+              vy: (Math.random() - 0.5) * 4,
+              r: 12,
+              color: `hsl(${Math.random()*360},80%,60%)`,
+            },
+          ];
+        }
+        tries++;
+      }
+      return balls;
+    });
   }
 
   function setMagnetStrength(idx: number, value: number) {
@@ -37,14 +116,6 @@ const MagnetSim: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     let running = true;
-    const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
-      x: Math.random() * WIDTH,
-      y: Math.random() * HEIGHT,
-      vx: (Math.random() - 0.5) * 2,
-      vy: (Math.random() - 0.5) * 2,
-      r: 6 + Math.random() * 6,
-      color: `hsl(${Math.random()*360}, 80%, 60%)`,
-    }));
     function animate() {
       if (!running) return;
       if (!ctx) return;
@@ -69,10 +140,10 @@ const MagnetSim: React.FC = () => {
         ctx.globalAlpha = 1;
       }
       // --- Ball-Ball Collisions ---
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const a = particles[i];
-          const b = particles[j];
+      for (let i = 0; i < balls.length; i++) {
+        for (let j = i + 1; j < balls.length; j++) {
+          const a = balls[i];
+          const b = balls[j];
           const dx = b.x - a.x;
           const dy = b.y - a.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
@@ -101,7 +172,7 @@ const MagnetSim: React.FC = () => {
         }
       }
       // Particles
-      for (const p of particles) {
+      for (const p of balls) {
         // Magnetic force from all magnets
         for (const mag of magnets) {
           const dx = mag.x - p.x, dy = mag.y - p.y;
@@ -122,7 +193,7 @@ const MagnetSim: React.FC = () => {
         if (p.y > HEIGHT - p.r) { p.y = HEIGHT - p.r; p.vy *= -0.7; p.vx *= 0.98; }
         if (p.y < p.r) { p.y = p.r; p.vy *= -0.7; }
       }
-      for (const p of particles) {
+      for (const p of balls) {
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fillStyle = p.color;
@@ -134,7 +205,7 @@ const MagnetSim: React.FC = () => {
     }
     animate();
     return () => { running = false; };
-  }, [magnets]);
+  }, [magnets, balls]);
 
   // Drag logic for multiple magnets
   useEffect(() => {
@@ -181,7 +252,10 @@ const MagnetSim: React.FC = () => {
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <h1>🧲 Magnet Simulation</h1>
       <p style={{ color: 'var(--color-text-secondary)' }}>Drag any red magnet to move the particles! Add more magnets for more fun.</p>
-      <button onClick={addMagnet} style={{ marginBottom: 12, padding: '8px 18px', fontSize: 16, borderRadius: 8, background: '#ff5252', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600 }}>Add Magnet</button>
+      <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
+        <button onClick={addMagnet} style={{ padding: '8px 18px', fontSize: 16, borderRadius: 8, background: '#ff5252', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600 }}>Add Magnet</button>
+        <button onClick={addBall} style={{ padding: '8px 18px', fontSize: 16, borderRadius: 8, background: '#2563eb', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600 }}>Add Ball</button>
+      </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8, width: 320 }}>
         {magnets.map((mag, idx) => (
           <label key={idx} style={{ color: '#ff5252', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, background: '#fff2', borderRadius: 8, padding: '4px 12px' }}>
