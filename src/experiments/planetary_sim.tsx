@@ -3,7 +3,7 @@ import React, { useRef, useEffect, useState } from 'react';
 const WIDTH = 700;
 const HEIGHT = 700;
 const SUN_RADIUS = 36;
-const SUN_STRENGTH = 5;
+const SUN_STRENGTH_DEFAULT = 5;
 const PLANET_RADIUS = 12;
 const G = 2000; // gravitational constant (tweak for fun)
 
@@ -19,9 +19,10 @@ interface Planet {
 const PlanetarySim: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [planets, setPlanets] = useState<Planet[]>([]);
+  const [sunMass, setSunMass] = useState(SUN_STRENGTH_DEFAULT);
 
   // Sun is fixed at center
-  const sun = { x: WIDTH / 2, y: HEIGHT / 2, strength: SUN_STRENGTH };
+  const sun = { x: WIDTH / 2, y: HEIGHT / 2, strength: sunMass };
 
   function addPlanet() {
     // Place planet at random angle, random distance from sun
@@ -143,7 +144,7 @@ const PlanetarySim: React.FC = () => {
         // Gravitational force from sun
         const dx = sun.x - p.x, dy = sun.y - p.y;
         const dist = Math.sqrt(dx*dx + dy*dy);
-        const force = G * sun.strength / (dist * dist + 100);
+        const force = G * sunMass / (dist * dist + 100);
         p.vx += force * dx / dist;
         p.vy += force * dy / dist;
         p.x += p.vx;
@@ -181,7 +182,7 @@ const PlanetarySim: React.FC = () => {
     }
     animate();
     return () => { running = false; };
-  }, [planets]);
+  }, [planets, sunMass]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
@@ -191,6 +192,19 @@ const PlanetarySim: React.FC = () => {
         <button onClick={addPlanet} style={{ padding: '10px 28px', fontSize: 18, borderRadius: 8, background: '#2563eb', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, boxShadow: '0 2px 8px #2563eb33' }}>Add Planet</button>
         <button onClick={resetPlanets} style={{ padding: '10px 28px', fontSize: 18, borderRadius: 8, background: '#222', color: '#ffb300', border: '2px solid #ffb300', cursor: 'pointer', fontWeight: 700 }}>Reset</button>
         <span style={{ color: '#fff', fontSize: 17, marginLeft: 8 }}>Planets: <b style={{ color: '#ffb300' }}>{planets.length}</b></span>
+        <label style={{ color: '#ffb300', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, background: '#fff2', borderRadius: 8, padding: '4px 12px', marginLeft: 8 }}>
+          Sun Mass
+          <input
+            type="range"
+            min="1"
+            max="15"
+            step="0.01"
+            value={sunMass}
+            onChange={e => setSunMass(Number(e.target.value))}
+            style={{ flex: 1, accentColor: '#ffb300' }}
+          />
+          <span style={{ minWidth: 40, textAlign: 'right', color: '#222', fontWeight: 700 }}>{sunMass.toFixed(2)}</span>
+        </label>
       </div>
       <div style={{ width: '100%', maxWidth: WIDTH, aspectRatio: '1 / 1', background: 'transparent', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 16px rgba(0,0,0,0.12)' }}>
         <canvas ref={canvasRef} width={WIDTH} height={HEIGHT} style={{ width: '100%', height: '100%', background: '#181825', borderRadius: 16, display: 'block' }} />
