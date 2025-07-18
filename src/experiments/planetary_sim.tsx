@@ -8,6 +8,7 @@ const PLANET_RADIUS = 12;
 const G = 2000; // gravitational constant (tweak for fun)
 
 interface Planet {
+  id: number;
   x: number;
   y: number;
   vx: number;
@@ -15,6 +16,8 @@ interface Planet {
   r: number;
   color: string;
 }
+
+let planetIdCounter = 1;
 
 const PlanetarySim: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -42,6 +45,7 @@ const PlanetarySim: React.FC = () => {
     setPlanets(ps => [
       ...ps,
       {
+        id: planetIdCounter++,
         x,
         y,
         vx,
@@ -122,7 +126,7 @@ const PlanetarySim: React.FC = () => {
           const dy = b.y - a.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           const minDist = a.r + b.r;
-          const pairKey = `${i},${j}`;
+          const pairKey = [a.id, b.id].sort().join(',');
           const isColliding = dist < minDist && dist > 0;
           if (isColliding) {
             newCollisions.add(pairKey);
