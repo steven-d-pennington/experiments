@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import ThemeToggle from './ThemeToggle';
+import AuthButton from './AuthButton';
 
 const Container = styled.div`
   min-height: 100vh;
@@ -64,6 +65,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
       <SiteTitle href="/">🧪 Experiments Gallery</SiteTitle>
       <Nav>
         <ThemeToggle />
+        <AuthButton />
       </Nav>
     </Header>
     <Main>{children}</Main>

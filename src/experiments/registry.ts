@@ -94,6 +94,17 @@ export const experiments: ExperimentRegistryItem[] = [
     fullPath: '/experiments/planetary-sim',
     component: () => import('./planetary_sim'),
   },
+  {
+    id: 'galaxy-3d',
+    title: '3D Galaxy Simulator',
+    description: 'Experience planets orbiting in true 3D space with depth, perspective, and rotation!',
+    author: 'AI',
+    created: '2025-01-24',
+    tags: ['physics', 'canvas', '3d', 'galaxy', 'orbit', 'perspective'],
+    thumbnailUrl: '/thumbnails/galaxy-3d.png',
+    fullPath: '/experiments/galaxy-3d',
+    component: () => import('./galaxy_3d'),
+  },
 ];
 
 export function getExperimentById(id: string) {

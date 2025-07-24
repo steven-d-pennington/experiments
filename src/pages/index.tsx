@@ -10,6 +10,7 @@ import TagFilter from '../components/TagFilter';
 import { useState, useEffect } from 'react';
 import SearchBar from '../components/SearchBar';
 import VoteButtons from '../components/VoteButtons';
+import { useUser } from '@supabase/auth-helpers-react';
 import { fetchVotes } from '../lib/voting';
 
 const geistSans = Geist({
@@ -67,6 +68,7 @@ const Tag = styled.span`
 `;
 
 export default function Home() {
+  const user = useUser();
   const router = useRouter();
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -79,7 +81,7 @@ export default function Home() {
       const counts: Record<string, number> = {};
       await Promise.all(experiments.map(async (exp) => {
         try {
-          const { total } = await fetchVotes(exp.id);
+          const { total } = await fetchVotes(exp.id, user);
           counts[exp.id] = total;
         } catch {
           counts[exp.id] = 0;

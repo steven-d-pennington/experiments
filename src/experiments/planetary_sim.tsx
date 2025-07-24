@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 
-const WIDTH = 700;
-const HEIGHT = 700;
+const WIDTH = 1200;
+const HEIGHT = 1200;
 const SUN_RADIUS = 36;
 const SUN_STRENGTH_DEFAULT = 5;
 const PLANET_RADIUS = 12;
@@ -15,9 +15,43 @@ interface Planet {
   vy: number;
   r: number;
   color: string;
+  trail: { x: number; y: number }[];
 }
 
 let planetIdCounter = 1;
+
+// Helper function to convert HSL color to RGBA with alpha
+function hslToRgba(hslColor: string, alpha: number): string {
+  // Extract hue, saturation, lightness from HSL string
+  const match = hslColor.match(/hsl\((\d+(?:\.\d+)?),\s*(\d+)%,\s*(\d+)%\)/);
+  if (!match) return `rgba(255,255,255,${alpha})`;
+  
+  const h = parseFloat(match[1]) / 360;
+  const s = parseFloat(match[2]) / 100;
+  const l = parseFloat(match[3]) / 100;
+  
+  const hue2rgb = (p: number, q: number, t: number) => {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1/6) return p + (q - p) * 6 * t;
+    if (t < 1/2) return q;
+    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+    return p;
+  };
+  
+  let r, g, b;
+  if (s === 0) {
+    r = g = b = l; // achromatic
+  } else {
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    r = hue2rgb(p, q, h + 1/3);
+    g = hue2rgb(p, q, h);
+    b = hue2rgb(p, q, h - 1/3);
+  }
+  
+  return `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)}, ${alpha})`;
+}
 
 const PlanetarySim: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -50,6 +84,7 @@ const PlanetarySim: React.FC = () => {
         vy,
         r: PLANET_RADIUS,
         color: `hsl(${Math.random()*360},80%,60%)`,
+        trail: [],
       },
     ]);
   }
@@ -68,21 +103,35 @@ const PlanetarySim: React.FC = () => {
     function animate() {
       if (!running || !ctx) return;
       ctx.clearRect(0, 0, WIDTH, HEIGHT);
-      // Draw subtle background grid
+      // Draw subtle background grid (larger for galaxy scale)
       ctx.save();
-      ctx.globalAlpha = 0.08;
+      ctx.globalAlpha = 0.06;
       ctx.strokeStyle = '#fff';
-      for (let x = 0; x < WIDTH; x += 50) {
+      for (let x = 0; x < WIDTH; x += 80) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
         ctx.lineTo(x, HEIGHT);
         ctx.stroke();
       }
-      for (let y = 0; y < HEIGHT; y += 50) {
+      for (let y = 0; y < HEIGHT; y += 80) {
         ctx.beginPath();
         ctx.moveTo(0, y);
         ctx.lineTo(WIDTH, y);
         ctx.stroke();
+      }
+      ctx.restore();
+      
+      // Add some distant stars for galaxy atmosphere
+      ctx.save();
+      ctx.globalAlpha = 0.3;
+      ctx.fillStyle = '#fff';
+      for (let i = 0; i < 50; i++) {
+        const x = (i * 137) % WIDTH; // pseudo-random distribution
+        const y = (i * 211) % HEIGHT;
+        const size = 0.5 + (i % 3) * 0.5;
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+        ctx.fill();
       }
       ctx.restore();
       // Animate sun glow
@@ -144,7 +193,8 @@ const PlanetarySim: React.FC = () => {
           }
         }
       }
-      // Planets
+      // Update planets physics
+      const planetsToKeep = [];
       for (const p of planets) {
         // Gravitational force from sun
         const dx = sun.x - p.x, dy = sun.y - p.y;
@@ -154,21 +204,64 @@ const PlanetarySim: React.FC = () => {
         p.vy += force * dy / dist;
         p.x += p.vx;
         p.y += p.vy;
-        // bounce off walls (optional, for fun)
-        if (p.x < p.r) { p.x = p.r; p.vx *= -0.8; }
-        if (p.x > WIDTH - p.r) { p.x = WIDTH - p.r; p.vx *= -0.8; }
-        if (p.y > HEIGHT - p.r) { p.y = HEIGHT - p.r; p.vy *= -0.8; }
-        if (p.y < p.r) { p.y = p.r; p.vy *= -0.8; }
+        
+        // Add current position to trail (every few frames for performance)
+        if (frame % 3 === 0) {
+          p.trail.push({ x: p.x, y: p.y });
+          // Keep trail length manageable (last 200 points)
+          if (p.trail.length > 200) {
+            p.trail.shift();
+          }
+        }
+        
+        // Remove planets that drift too far from the galaxy center
+        const distFromCenter = Math.sqrt((p.x - sun.x) ** 2 + (p.y - sun.y) ** 2);
+        if (distFromCenter <= WIDTH * 1.2) {
+          planetsToKeep.push(p);
+        }
       }
-      // Draw orbits (trails)
+      
+      // Update planets state if any were removed
+      if (planetsToKeep.length !== planets.length) {
+        setPlanets(planetsToKeep);
+      }
+      // Draw actual planet trails (where they've been)
       ctx.save();
-      ctx.globalAlpha = 0.28;
+      for (const p of planets) {
+        if (p.trail.length > 1) {
+          ctx.beginPath();
+          ctx.moveTo(p.trail[0].x, p.trail[0].y);
+          for (let i = 1; i < p.trail.length; i++) {
+            ctx.lineTo(p.trail[i].x, p.trail[i].y);
+          }
+          // Create gradient effect - older trail points are more transparent
+          const gradient = ctx.createLinearGradient(
+            p.trail[0]?.x || p.x, p.trail[0]?.y || p.y,
+            p.x, p.y
+          );
+          gradient.addColorStop(0, hslToRgba(p.color, 0.12)); // Very transparent start
+          gradient.addColorStop(0.7, hslToRgba(p.color, 0.4)); // Medium transparency
+          gradient.addColorStop(1, hslToRgba(p.color, 0.7)); // More opaque end
+          ctx.strokeStyle = gradient;
+          ctx.lineWidth = 3;
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+          ctx.stroke();
+        }
+      }
+      ctx.restore();
+      
+      // Draw orbital reference circles (current distance from sun)
+      ctx.save();
+      ctx.globalAlpha = 0.15;
       for (const p of planets) {
         ctx.beginPath();
         ctx.arc(sun.x, sun.y, Math.sqrt((p.x - sun.x) ** 2 + (p.y - sun.y) ** 2), 0, Math.PI * 2);
         ctx.strokeStyle = p.color;
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 1;
+        ctx.setLineDash([5, 10]);
         ctx.stroke();
+        ctx.setLineDash([]);
       }
       ctx.restore();
       // Draw planets

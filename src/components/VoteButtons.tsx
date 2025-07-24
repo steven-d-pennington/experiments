@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { fetchVotes, upsertVote } from '../lib/voting';
 import styled from 'styled-components';
+import { useUser } from '@supabase/auth-helpers-react';
 
 const VoteContainer = styled.div`
   display: flex;
@@ -50,6 +51,7 @@ interface VoteButtonsProps {
 }
 
 const VoteButtons: React.FC<VoteButtonsProps> = ({ experimentId }) => {
+  const user = useUser();
   const [vote, setVote] = useState<1 | -1 | 0>(0);
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -58,7 +60,7 @@ const VoteButtons: React.FC<VoteButtonsProps> = ({ experimentId }) => {
   async function refreshVotes() {
     setLoading(true);
     try {
-      const { total, userVote } = await fetchVotes(experimentId);
+      const { total, userVote } = await fetchVotes(experimentId, user);
       setCount(total);
       setVote(userVote as 1 | -1 | 0);
       setError(null);
@@ -79,7 +81,7 @@ const VoteButtons: React.FC<VoteButtonsProps> = ({ experimentId }) => {
     setVote(newVote);
     setCount(c => c + (newVote - vote)); // Optimistic update
     try {
-      const { total, userVote } = await upsertVote(experimentId, newVote);
+      const { total, userVote } = await upsertVote(experimentId, newVote, user);
       setCount(total);
       setVote(userVote as 1 | -1 | 0);
       setError(null);
