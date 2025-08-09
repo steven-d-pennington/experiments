@@ -3,6 +3,7 @@ const nextConfig = {
   compiler: {
     styledComponents: true,
   },
+  transpilePackages: ['@supabase/auth-helpers-nextjs', '@supabase/auth-helpers-react'],
 };
 
 module.exports = nextConfig; 
