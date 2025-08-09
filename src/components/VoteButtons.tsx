@@ -64,7 +64,8 @@ const VoteButtons: React.FC<VoteButtonsProps> = ({ experimentId }) => {
       setCount(total);
       setVote(userVote as 1 | -1 | 0);
       setError(null);
-    } catch {
+    } catch (error) {
+      console.error('Failed to load votes:', error);
       setError('Failed to load votes');
     } finally {
       setLoading(false);
@@ -85,7 +86,8 @@ const VoteButtons: React.FC<VoteButtonsProps> = ({ experimentId }) => {
       setCount(total);
       setVote(userVote as 1 | -1 | 0);
       setError(null);
-    } catch {
+    } catch (error) {
+      console.error('Failed to vote:', error);
       setError('Failed to vote. Please try again.');
       setVote(vote); // Revert
       refreshVotes();
