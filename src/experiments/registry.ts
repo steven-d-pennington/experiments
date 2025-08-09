@@ -97,7 +97,8 @@ export const experiments: ExperimentRegistryItem[] = [
   {
     id: 'galaxy-3d',
     title: '3D Galaxy Simulator',
-    description: 'Experience planets orbiting in true 3D space with depth, perspective, and rotation!',
+    description:
+      'Experience planets orbiting in true 3D space with depth, perspective, and rotation!',
     author: 'AI',
     created: '2025-01-24',
     tags: ['physics', 'canvas', '3d', 'galaxy', 'orbit', 'perspective'],
@@ -108,9 +109,9 @@ export const experiments: ExperimentRegistryItem[] = [
 ];
 
 export function getExperimentById(id: string) {
-  return experiments.find(e => e.id === id);
+  return experiments.find((e) => e.id === id);
 }
 
 export function getExperimentsByTag(tag: string) {
-  return experiments.filter(e => e.tags.includes(tag));
-} 
+  return experiments.filter((e) => e.tags.includes(tag));
+}

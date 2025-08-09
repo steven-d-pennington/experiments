@@ -18,11 +18,12 @@ This document outlines the plan to implement user authentication and management 
 1.  **Enable Google Auth Provider:**
     - In the Supabase project dashboard, navigate to **Authentication -> Providers**.
     - Enable and configure the **Google** provider using the credentials from the Google Cloud Console.
-    *Note: This step requires manual configuration in the Supabase UI.*
+      _Note: This step requires manual configuration in the Supabase UI._
 
 2.  **Create `profiles` Table:**
     - Create a new table named `profiles` to store public user data that is safe to expose to the client. This table will be linked to the private `auth.users` table.
     - **SQL for `profiles` table:**
+
       ```sql
       -- Create the profiles table
       CREATE TABLE public.profiles (
@@ -61,6 +62,7 @@ This document outlines the plan to implement user authentication and management 
 ### Phase 2: Client-Side Implementation
 
 1.  **Install Supabase Auth Helpers:**
+
     ```bash
     npm install @supabase/auth-helpers-nextjs @supabase/supabase-js
     ```

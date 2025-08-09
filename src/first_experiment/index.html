@@ -1,88 +1,88 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gravity Balls Game</title>
     <style>
-        body {
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-        
-        h1 {
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            margin-bottom: 10px;
-        }
-        
-        .instructions {
-            color: white;
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 18px;
-        }
-        
-        canvas {
-            border: 3px solid white;
-            border-radius: 10px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            cursor: crosshair;
-        }
-        
-        .controls {
-            margin-top: 15px;
-            display: flex;
-            gap: 10px;
-        }
-        
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            background: #ff6b6b;
-            color: white;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        
-        button:hover {
-            background: #ff5252;
-        }
-        
-        .stats {
-            color: white;
-            margin-top: 10px;
-            font-size: 18px;
-        }
+      body {
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      h1 {
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        margin-bottom: 10px;
+      }
+
+      .instructions {
+        color: white;
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 18px;
+      }
+
+      canvas {
+        border: 3px solid white;
+        border-radius: 10px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        cursor: crosshair;
+      }
+
+      .controls {
+        margin-top: 15px;
+        display: flex;
+        gap: 10px;
+      }
+
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        background: #ff6b6b;
+        color: white;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+
+      button:hover {
+        background: #ff5252;
+      }
+
+      .stats {
+        color: white;
+        margin-top: 10px;
+        font-size: 18px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <h1>🌍 Gravity Balls Game</h1>
     <div class="instructions">
-        Click anywhere on the canvas to drop balls!<br>
-        Watch them bounce with realistic physics
+      Click anywhere on the canvas to drop balls!<br />
+      Watch them bounce with realistic physics
     </div>
-    
+
     <canvas id="gameCanvas" width="800" height="600"></canvas>
-    
+
     <div class="controls">
-        <button onclick="clearBalls()">Clear All Balls</button>
-        <button onclick="toggleGravity()">Toggle Gravity</button>
+      <button onclick="clearBalls()">Clear All Balls</button>
+      <button onclick="toggleGravity()">Toggle Gravity</button>
     </div>
-    
+
     <div class="stats">
-        <span id="ballCount">Balls: 0</span> | 
-        <span id="gravityStatus">Gravity: ON</span>
+      <span id="ballCount">Balls: 0</span> |
+      <span id="gravityStatus">Gravity: ON</span>
     </div>
 
     <script src="game.js"></script>
-</body>
+  </body>
 </html>

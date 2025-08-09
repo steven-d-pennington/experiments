@@ -7,7 +7,7 @@ const AuthContainer = styled.div`
 `;
 
 const AuthButtonStyled = styled.button`
-  background-color: ${props => props.theme.colors.primary};
+  background-color: ${(props) => props.theme.colors.primary};
   color: white;
   border: none;
   padding: 10px 20px;
@@ -16,7 +16,7 @@ const AuthButtonStyled = styled.button`
   font-size: 1rem;
 
   &:hover {
-    background-color: ${props => props.theme.colors.primaryHover};
+    background-color: ${(props) => props.theme.colors.primaryHover};
   }
 `;
 
@@ -33,10 +33,10 @@ const Avatar = styled.img`
 `;
 
 const LogoutButton = styled(AuthButtonStyled)`
-  background-color: ${props => props.theme.colors.secondary};
+  background-color: ${(props) => props.theme.colors.secondary};
 
   &:hover {
-    background-color: ${props => props.theme.colors.secondaryHover};
+    background-color: ${(props) => props.theme.colors.secondaryHover};
   }
 `;
 
@@ -56,7 +56,12 @@ const AuthButton = () => {
     <AuthContainer>
       {user ? (
         <UserInfo>
-          {user.user_metadata.avatar_url && <Avatar src={user.user_metadata.avatar_url} alt={user.user_metadata.full_name || 'User Avatar'} />}
+          {user.user_metadata.avatar_url && (
+            <Avatar
+              src={user.user_metadata.avatar_url}
+              alt={user.user_metadata.full_name || 'User Avatar'}
+            />
+          )}
           <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
         </UserInfo>
       ) : (
@@ -97,4 +102,3 @@ const AuthButton = () => {
 };
 
 export default AuthButton;
-

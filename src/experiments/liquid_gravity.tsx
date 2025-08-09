@@ -7,7 +7,7 @@ const OCTAGON_RADIUS = Math.min(WIDTH, HEIGHT) * 0.48; // nearly fills canvas
 const OCTAGON_SIDES = 8;
 
 function randomColor() {
-  return `hsl(${Math.random()*360}, 80%, 60%)`;
+  return `hsl(${Math.random() * 360}, 80%, 60%)`;
 }
 
 // Define a type for the canvas with particles
@@ -37,7 +37,7 @@ function getOctagonVertices(cx: number, cy: number, radius: number, angle: numbe
   return verts;
 }
 
-function pointToEdgeDistance(px: number, py: number, verts: {x: number, y: number}[]) {
+function pointToEdgeDistance(px: number, py: number, verts: { x: number; y: number }[]) {
   // Returns the minimum distance from point (px, py) to the inside of the octagon
   let minDist = Infinity;
   for (let i = 0; i < verts.length; i++) {
@@ -53,14 +53,14 @@ function pointToEdgeDistance(px: number, py: number, verts: {x: number, y: numbe
     const apx = px - a.x;
     const apy = py - a.y;
     // Signed distance from point to edge
-    const edgeLen = Math.sqrt(ex*ex + ey*ey);
+    const edgeLen = Math.sqrt(ex * ex + ey * ey);
     const dist = (apx * nx + apy * ny) / edgeLen;
     if (dist < minDist) minDist = dist;
   }
   return minDist;
 }
 
-function isInsideOctagon(x: number, y: number, verts: {x: number, y: number}[]) {
+function isInsideOctagon(x: number, y: number, verts: { x: number; y: number }[]) {
   return pointToEdgeDistance(x, y, verts) < 0;
 }
 
@@ -164,19 +164,20 @@ const LiquidGravity: React.FC = () => {
         if (dist > -p.r) {
           // Find nearest edge normal in local frame
           let minDist = Infinity;
-          let nx = 0, ny = 0;
+          let nx = 0,
+            ny = 0;
           for (let i = 0; i < vertsLocal.length; i++) {
             const a = vertsLocal[i];
             const b = vertsLocal[(i + 1) % vertsLocal.length];
             const ex = b.x - a.x;
             const ey = b.y - a.y;
-            const edgeLen = Math.sqrt(ex*ex + ey*ey);
+            const edgeLen = Math.sqrt(ex * ex + ey * ey);
             const tx = (local.x - a.x) / edgeLen;
             const closestX = a.x + ex * Math.max(0, Math.min(1, tx));
             const closestY = a.y + ey * Math.max(0, Math.min(1, tx));
             const dx = local.x - closestX;
             const dy = local.y - closestY;
-            const d = Math.sqrt(dx*dx + dy*dy);
+            const d = Math.sqrt(dx * dx + dy * dy);
             if (d < minDist) {
               minDist = d;
               nx = ey / edgeLen;
@@ -223,16 +224,18 @@ const LiquidGravity: React.FC = () => {
       // connect close particles
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
-          const a = particles[i], b = particles[j];
-          const dx = a.x - b.x, dy = a.y - b.y;
-          const dist = Math.sqrt(dx*dx + dy*dy);
+          const a = particles[i],
+            b = particles[j];
+          const dx = a.x - b.x,
+            dy = a.y - b.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < 60) {
             ctx.beginPath();
             ctx.moveTo(a.x, a.y);
             ctx.lineTo(b.x, b.y);
             ctx.strokeStyle = a.color;
             ctx.globalAlpha = 0.2;
-            ctx.lineWidth = 4 - dist/20;
+            ctx.lineWidth = 4 - dist / 20;
             ctx.stroke();
             ctx.globalAlpha = 1;
           }
@@ -241,15 +244,28 @@ const LiquidGravity: React.FC = () => {
       requestAnimationFrame(animate);
     }
     animate();
-    return () => { running = false; };
+    return () => {
+      running = false;
+    };
   }, []);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <h1>💧 Liquid Gravity</h1>
-      <p style={{ color: 'var(--color-text-secondary)' }}>A mesmerizing simulation of liquid particles under gravity. Try clicking to add a splash!</p>
-      <canvas ref={canvasRef} width={WIDTH} height={HEIGHT} style={{ borderRadius: 16, background: 'var(--color-surface)', boxShadow: '0 2px 16px rgba(0,0,0,0.08)', margin: 16 }}
-        onClick={e => {
+      <p style={{ color: 'var(--color-text-secondary)' }}>
+        A mesmerizing simulation of liquid particles under gravity. Try clicking to add a splash!
+      </p>
+      <canvas
+        ref={canvasRef}
+        width={WIDTH}
+        height={HEIGHT}
+        style={{
+          borderRadius: 16,
+          background: 'var(--color-surface)',
+          boxShadow: '0 2px 16px rgba(0,0,0,0.08)',
+          margin: 16,
+        }}
+        onClick={(e) => {
           const rect = canvasRef.current!.getBoundingClientRect();
           const x = e.clientX - rect.left;
           const y = e.clientY - rect.top;
@@ -286,4 +302,4 @@ const LiquidGravity: React.FC = () => {
   );
 };
 
-export default LiquidGravity; 
+export default LiquidGravity;

@@ -8,15 +8,12 @@ interface AuthContextType {
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
- 
- export const AuthProvider = ({ children }: { children: ReactNode }) => {
-   const session = useSession();
-   const supabaseClient = useSupabaseClient();
- 
-   return (
-     <AuthContext.Provider value={{ session, supabaseClient }}>
-       {children}
-     </AuthContext.Provider>
-   );
- };
 
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const session = useSession();
+  const supabaseClient = useSupabaseClient();
+
+  return (
+    <AuthContext.Provider value={{ session, supabaseClient }}>{children}</AuthContext.Provider>
+  );
+};

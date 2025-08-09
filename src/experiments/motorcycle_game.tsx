@@ -12,9 +12,14 @@ const MotorcycleGame: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     const running = true;
-    let x = 100, y = HEIGHT - 40, vx = 0, vy = 0, angle = 0, onGround = true;
+    let x = 100,
+      y = HEIGHT - 40,
+      vx = 0,
+      vy = 0,
+      angle = 0,
+      onGround = true;
     const keys: Record<string, boolean> = {};
-    const ground = Array.from({ length: WIDTH }, (_, i) => HEIGHT - 40 - Math.sin(i/60) * 20);
+    const ground = Array.from({ length: WIDTH }, (_, i) => HEIGHT - 40 - Math.sin(i / 60) * 20);
     function drawBike() {
       if (!ctx) return;
       ctx.save();
@@ -85,10 +90,22 @@ const MotorcycleGame: React.FC = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <h1>🏍️ Motorcycle Game</h1>
-      <p style={{ color: 'var(--color-text-secondary)' }}>Use Left/Right arrows to move, Space to jump!</p>
-      <canvas ref={canvasRef} width={WIDTH} height={HEIGHT} style={{ borderRadius: 16, background: 'var(--color-surface)', boxShadow: '0 2px 16px rgba(0,0,0,0.08)', margin: 16 }} />
+      <p style={{ color: 'var(--color-text-secondary)' }}>
+        Use Left/Right arrows to move, Space to jump!
+      </p>
+      <canvas
+        ref={canvasRef}
+        width={WIDTH}
+        height={HEIGHT}
+        style={{
+          borderRadius: 16,
+          background: 'var(--color-surface)',
+          boxShadow: '0 2px 16px rgba(0,0,0,0.08)',
+          margin: 16,
+        }}
+      />
     </div>
   );
 };
 
-export default MotorcycleGame; 
+export default MotorcycleGame;
