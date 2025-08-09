@@ -1,4 +1,3 @@
-
 ## Voting Feature Design
 
 ### Overview
@@ -11,6 +10,7 @@
 ### Supabase Schema
 
 **Table: experiment_votes**
+
 - id: uuid (primary key)
 - experiment_id: text (indexed)
 - vote: integer (1 for upvote, -1 for downvote)
@@ -19,12 +19,14 @@
 - created_at: timestamp
 
 ### API
+
 - GET /votes?experiment_id=... → returns total votes and user vote
 - POST /votes → upsert vote for experiment/device
 
 ### UI/UX
+
 - Upvote/downvote buttons on each experiment card (with current count)
 - Highlight user's vote
 - Optimistic UI update on vote
 - Error message if vote fails
-- Sorting toggle: by votes or by newest 
+- Sorting toggle: by votes or by newest

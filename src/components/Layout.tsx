@@ -18,7 +18,7 @@ const Header = styled.header`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -70,9 +70,12 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     </Header>
     <Main>{children}</Main>
     <Footer>
-      &copy; {new Date().getFullYear()} Experiments Gallery &mdash; <a href="https://github.com/" target="_blank" rel="noopener noreferrer">GitHub</a>
+      &copy; {new Date().getFullYear()} Experiments Gallery &mdash;{' '}
+      <a href="https://github.com/" target="_blank" rel="noopener noreferrer">
+        GitHub
+      </a>
     </Footer>
   </Container>
 );
 
-export default Layout; 
+export default Layout;

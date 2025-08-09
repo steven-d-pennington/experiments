@@ -10,4 +10,4 @@ const customJestConfig = {
   testEnvironment: 'jsdom',
 };
 
-module.exports = createJestConfig(customJestConfig); 
+module.exports = createJestConfig(customJestConfig);

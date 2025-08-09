@@ -17,7 +17,9 @@ const TagButton = styled.button<{ selected: boolean }>`
   padding: 0.3em 1em;
   font-size: 1em;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
   &:hover {
     background: var(--color-accent);
     color: var(--color-background);
@@ -30,18 +32,14 @@ interface TagFilterProps {
 }
 
 const TagFilter: React.FC<TagFilterProps> = ({ selectedTag, onSelect }) => {
-  const allTags = Array.from(new Set(experiments.flatMap(e => e.tags)));
+  const allTags = Array.from(new Set(experiments.flatMap((e) => e.tags)));
   return (
     <TagList>
       <TagButton selected={!selectedTag} onClick={() => onSelect(null)}>
         All
       </TagButton>
-      {allTags.map(tag => (
-        <TagButton
-          key={tag}
-          selected={selectedTag === tag}
-          onClick={() => onSelect(tag)}
-        >
+      {allTags.map((tag) => (
+        <TagButton key={tag} selected={selectedTag === tag} onClick={() => onSelect(tag)}>
           {tag}
         </TagButton>
       ))}
@@ -49,4 +47,4 @@ const TagFilter: React.FC<TagFilterProps> = ({ selectedTag, onSelect }) => {
   );
 };
 
-export default TagFilter; 
+export default TagFilter;

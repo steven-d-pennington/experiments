@@ -12,7 +12,7 @@ const VoteContainer = styled.div`
   border-radius: 1em;
   padding: 0.5em 0.7em;
   min-width: 2.5em;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
   margin-top: 0.5em;
   margin-bottom: 0.5em;
 `;
@@ -32,7 +32,9 @@ const VoteBtn = styled.button<{ selected: boolean; up?: boolean }>`
   align-items: center;
   justify-content: center;
   margin: 0.1em 0;
-  transition: background 0.18s, color 0.18s;
+  transition:
+    background 0.18s,
+    color 0.18s;
   &:hover {
     background: ${({ up }) => (up ? 'var(--color-accent)' : 'var(--color-error)')};
     color: var(--color-background);
@@ -80,7 +82,7 @@ const VoteButtons: React.FC<VoteButtonsProps> = ({ experimentId }) => {
   async function handleVote(newVote: 1 | -1) {
     if (vote === newVote) return; // Prevent double voting
     setVote(newVote);
-    setCount(c => c + (newVote - vote)); // Optimistic update
+    setCount((c) => c + (newVote - vote)); // Optimistic update
     try {
       const { total, userVote } = await upsertVote(experimentId, newVote, user);
       setCount(total);
@@ -114,9 +116,11 @@ const VoteButtons: React.FC<VoteButtonsProps> = ({ experimentId }) => {
       >
         ▼
       </VoteBtn>
-      {error && <span style={{ color: 'var(--color-error)', marginTop: 4, fontSize: 12 }}>{error}</span>}
+      {error && (
+        <span style={{ color: 'var(--color-error)', marginTop: 4, fontSize: 12 }}>{error}</span>
+      )}
     </VoteContainer>
   );
 };
 
-export default VoteButtons; 
+export default VoteButtons;
