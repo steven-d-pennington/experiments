@@ -30,11 +30,11 @@ function rotateVector(vx: number, vy: number, angle: number) {
 // Returns the distance from the center to the edge of a regular polygon at angle theta
 function polygonEdgeDistance(radius: number, sides: number, theta: number) {
   // theta: angle from center to point (in local frame)
-  const sector = Math.PI * 2 / sides;
+  const sector = (Math.PI * 2) / sides;
   const halfSector = sector / 2;
   // Find the angle to the nearest edge
   const angleToEdge = halfSector - Math.abs(((theta + halfSector) % sector) - halfSector);
-  return radius * Math.cos(halfSector) / Math.cos(angleToEdge);
+  return (radius * Math.cos(halfSector)) / Math.cos(angleToEdge);
 }
 
 interface Ball {
@@ -66,7 +66,7 @@ const OctagonBounce: React.FC = () => {
       for (const b of balls.current) {
         const dx = b.x - x;
         const dy = b.y - y;
-        if (Math.sqrt(dx*dx + dy*dy) < b.r + 12) {
+        if (Math.sqrt(dx * dx + dy * dy) < b.r + 12) {
           overlap = true;
           break;
         }
@@ -78,10 +78,10 @@ const OctagonBounce: React.FC = () => {
           vx: (Math.random() - 0.5) * 4,
           vy: (Math.random() - 0.5) * 4,
           r: 12,
-          color: `hsl(${Math.random()*360},80%,60%)`,
+          color: `hsl(${Math.random() * 360},80%,60%)`,
         });
         // force UI update
-        setSpinSpeed(s => s);
+        setSpinSpeed((s) => s);
         break;
       }
       tries++;
@@ -90,7 +90,7 @@ const OctagonBounce: React.FC = () => {
 
   function resetBalls() {
     balls.current = [];
-    setSpinSpeed(s => s); // force UI update
+    setSpinSpeed((s) => s); // force UI update
   }
 
   useEffect(() => {
@@ -109,7 +109,7 @@ const OctagonBounce: React.FC = () => {
           vx: (Math.random() - 0.5) * 4,
           vy: (Math.random() - 0.5) * 4,
           r: 12,
-          color: `hsl(${Math.random()*360},80%,60%)`,
+          color: `hsl(${Math.random() * 360},80%,60%)`,
         });
         tries++;
       }
@@ -239,17 +239,72 @@ const OctagonBounce: React.FC = () => {
       requestAnimationFrame(animate);
     }
     animate();
-    return () => { running = false; };
+    return () => {
+      running = false;
+    };
   }, [spinSpeed]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-      <h2 style={{ color: '#ffb300', fontWeight: 700, fontSize: 32, margin: '24px 0 8px 0', letterSpacing: 1 }}>Octagon Bounce</h2>
-      <div style={{ color: '#fff', fontSize: 16, marginBottom: 8, opacity: 0.8 }}>Balls bouncing inside a spinning octagon. Try adding more balls or increasing the spin speed!</div>
-      <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
-        <button onClick={addBall} style={{ padding: '8px 18px', fontSize: 16, borderRadius: 8, background: '#ffb300', color: '#222', border: 'none', cursor: 'pointer', fontWeight: 600, boxShadow: '0 2px 8px #ffb30033' }}>Add Ball</button>
-        <button onClick={resetBalls} style={{ padding: '8px 18px', fontSize: 16, borderRadius: 8, background: '#222', color: '#ffb300', border: '2px solid #ffb300', cursor: 'pointer', fontWeight: 600 }}>Reset</button>
-        <label style={{ color: '#fff', fontSize: 15, display: 'flex', alignItems: 'center', gap: 8 }}>
+      <h2
+        style={{
+          color: '#ffb300',
+          fontWeight: 700,
+          fontSize: 32,
+          margin: '24px 0 8px 0',
+          letterSpacing: 1,
+        }}
+      >
+        Octagon Bounce
+      </h2>
+      <div style={{ color: '#fff', fontSize: 16, marginBottom: 8, opacity: 0.8 }}>
+        Balls bouncing inside a spinning octagon. Try adding more balls or increasing the spin
+        speed!
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          gap: 16,
+          alignItems: 'center',
+          marginBottom: 16,
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+        }}
+      >
+        <button
+          onClick={addBall}
+          style={{
+            padding: '8px 18px',
+            fontSize: 16,
+            borderRadius: 8,
+            background: '#ffb300',
+            color: '#222',
+            border: 'none',
+            cursor: 'pointer',
+            fontWeight: 600,
+            boxShadow: '0 2px 8px #ffb30033',
+          }}
+        >
+          Add Ball
+        </button>
+        <button
+          onClick={resetBalls}
+          style={{
+            padding: '8px 18px',
+            fontSize: 16,
+            borderRadius: 8,
+            background: '#222',
+            color: '#ffb300',
+            border: '2px solid #ffb300',
+            cursor: 'pointer',
+            fontWeight: 600,
+          }}
+        >
+          Reset
+        </button>
+        <label
+          style={{ color: '#fff', fontSize: 15, display: 'flex', alignItems: 'center', gap: 8 }}
+        >
           Spin Speed
           <input
             type="range"
@@ -257,18 +312,50 @@ const OctagonBounce: React.FC = () => {
             max="0.1"
             step="0.001"
             value={spinSpeed}
-            onChange={e => setSpinSpeed(Number(e.target.value))}
+            onChange={(e) => setSpinSpeed(Number(e.target.value))}
             style={{ marginLeft: 0, verticalAlign: 'middle', accentColor: '#ffb300' }}
           />
-          <span style={{ color: '#ffb300', minWidth: 48, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{spinSpeed.toFixed(3)}</span>
+          <span
+            style={{
+              color: '#ffb300',
+              minWidth: 48,
+              textAlign: 'right',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {spinSpeed.toFixed(3)}
+          </span>
         </label>
-        <span style={{ color: '#fff', fontSize: 15, marginLeft: 8 }}>Balls: <b style={{ color: '#ffb300' }}>{balls.current.length}</b></span>
+        <span style={{ color: '#fff', fontSize: 15, marginLeft: 8 }}>
+          Balls: <b style={{ color: '#ffb300' }}>{balls.current.length}</b>
+        </span>
       </div>
-      <div style={{ width: '100%', maxWidth: CANVAS_SIZE, aspectRatio: '1 / 1', background: 'transparent', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 16px rgba(0,0,0,0.12)' }}>
-        <canvas ref={canvasRef} width={WIDTH} height={HEIGHT} style={{ width: '100%', height: '100%', background: '#181825', borderRadius: 16, display: 'block' }} />
+      <div
+        style={{
+          width: '100%',
+          maxWidth: CANVAS_SIZE,
+          aspectRatio: '1 / 1',
+          background: 'transparent',
+          borderRadius: 16,
+          overflow: 'hidden',
+          boxShadow: '0 2px 16px rgba(0,0,0,0.12)',
+        }}
+      >
+        <canvas
+          ref={canvasRef}
+          width={WIDTH}
+          height={HEIGHT}
+          style={{
+            width: '100%',
+            height: '100%',
+            background: '#181825',
+            borderRadius: 16,
+            display: 'block',
+          }}
+        />
       </div>
     </div>
   );
 };
 
-export default OctagonBounce; 
+export default OctagonBounce;

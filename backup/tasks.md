@@ -1,4 +1,3 @@
-
 - [ ] 13. Implement voting feature
   - [ ] 13.1 Set up Supabase project and table (experiment_votes)
     - Create table with columns: id, experiment_id, vote, device_id, created_at
@@ -20,4 +19,4 @@
   - [ ] 13.5 Sort gallery by vote count
     - Fetch and display experiments sorted by votes
     - Add toggle for sorting by votes or newest
-    - _Requirements: 6.5_ 
+    - _Requirements: 6.5_

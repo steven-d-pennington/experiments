@@ -10,8 +10,10 @@ const ToggleButton = styled.button`
   padding: 0.5em 1.2em;
   font-size: 1em;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  transition: background 0.2s, color 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition:
+    background 0.2s,
+    color 0.2s;
   margin: 0.5em;
   &:hover {
     background: var(--color-accent);
@@ -21,7 +23,7 @@ const ToggleButton = styled.button`
 
 const ThemeToggle: React.FC = () => {
   const { currentTheme, availableThemes, setTheme } = useTheme();
-  const currentIdx = availableThemes.findIndex(t => t.id === currentTheme.id);
+  const currentIdx = availableThemes.findIndex((t) => t.id === currentTheme.id);
   const nextTheme = () => {
     const nextIdx = (currentIdx + 1) % availableThemes.length;
     setTheme(availableThemes[nextIdx].id);
@@ -33,4 +35,4 @@ const ThemeToggle: React.FC = () => {
   );
 };
 
-export default ThemeToggle; 
+export default ThemeToggle;

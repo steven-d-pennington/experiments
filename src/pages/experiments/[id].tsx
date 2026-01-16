@@ -15,22 +15,32 @@ const ExperimentPage: React.FC = () => {
   const experiment = getExperimentById(id);
 
   if (!experiment) {
-    return <div style={{ color: 'var(--color-error)', padding: 32, textAlign: 'center' }}>
-      <h2>Experiment not found</h2>
-      <button onClick={() => router.push('/')}>Back to Gallery</button>
-    </div>;
+    return (
+      <div style={{ color: 'var(--color-error)', padding: 32, textAlign: 'center' }}>
+        <h2>Experiment not found</h2>
+        <button onClick={() => router.push('/')}>Back to Gallery</button>
+      </div>
+    );
   }
 
   const LazyExperiment = React.lazy(experiment.component);
 
   return (
     <ErrorBoundary>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 24 }}>
-      </div>
+      <div
+        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 24 }}
+      ></div>
       <Suspense fallback={<div>Loading experiment...</div>}>
         <LazyExperiment />
       </Suspense>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '32px 0 0 0' }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          margin: '32px 0 0 0',
+        }}
+      >
         <VoteButtons experimentId={experiment.id} />
       </div>
       <div style={{ marginTop: 24, textAlign: 'center' }}>
@@ -40,4 +50,4 @@ const ExperimentPage: React.FC = () => {
   );
 };
 
-export default ExperimentPage; 
+export default ExperimentPage;

@@ -37,7 +37,7 @@ const GravityWellSim: React.FC = () => {
       for (const b of arr) {
         const dx = b.x - x;
         const dy = b.y - y;
-        if (Math.sqrt(dx*dx + dy*dy) < b.r + 12) {
+        if (Math.sqrt(dx * dx + dy * dy) < b.r + 12) {
           overlap = true;
           break;
         }
@@ -49,7 +49,7 @@ const GravityWellSim: React.FC = () => {
           vx: (Math.random() - 0.5) * 4,
           vy: (Math.random() - 0.5) * 4,
           r: 12,
-          color: `hsl(${Math.random()*360},80%,60%)`,
+          color: `hsl(${Math.random() * 360},80%,60%)`,
         });
       }
       tries++;
@@ -62,14 +62,19 @@ const GravityWellSim: React.FC = () => {
   const [dragIndex, setDragIndex] = useState<number | null>(null);
 
   function addWell() {
-    setWells(ws => [
+    setWells((ws) => [
       ...ws,
-      { x: WIDTH / 2 + Math.random() * 100 - 50, y: HEIGHT / 2 + Math.random() * 100 - 50, dragging: false, strength: 1 },
+      {
+        x: WIDTH / 2 + Math.random() * 100 - 50,
+        y: HEIGHT / 2 + Math.random() * 100 - 50,
+        dragging: false,
+        strength: 1,
+      },
     ]);
   }
 
   function addBall() {
-    setBalls(balls => {
+    setBalls((balls) => {
       const cx = WIDTH / 2;
       const cy = HEIGHT / 2;
       let tries = 0;
@@ -82,7 +87,7 @@ const GravityWellSim: React.FC = () => {
         for (const b of balls) {
           const dx = b.x - x;
           const dy = b.y - y;
-          if (Math.sqrt(dx*dx + dy*dy) < b.r + 12) {
+          if (Math.sqrt(dx * dx + dy * dy) < b.r + 12) {
             overlap = true;
             break;
           }
@@ -96,7 +101,7 @@ const GravityWellSim: React.FC = () => {
               vx: (Math.random() - 0.5) * 4,
               vy: (Math.random() - 0.5) * 4,
               r: 12,
-              color: `hsl(${Math.random()*360},80%,60%)`,
+              color: `hsl(${Math.random() * 360},80%,60%)`,
             },
           ];
         }
@@ -107,7 +112,7 @@ const GravityWellSim: React.FC = () => {
   }
 
   function setWellStrength(idx: number, value: number) {
-    setWells(ws => ws.map((w, i) => i === idx ? { ...w, strength: value } : w));
+    setWells((ws) => ws.map((w, i) => (i === idx ? { ...w, strength: value } : w)));
   }
 
   useEffect(() => {
@@ -175,12 +180,13 @@ const GravityWellSim: React.FC = () => {
       for (const p of balls) {
         // Gravitational force from all wells
         for (const well of wells) {
-          const dx = well.x - p.x, dy = well.y - p.y;
-          const dist = Math.sqrt(dx*dx + dy*dy);
+          const dx = well.x - p.x,
+            dy = well.y - p.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < 200) {
-            const force = 2000 * well.strength / (dist * dist + 100);
-            p.vx += force * dx / dist;
-            p.vy += force * dy / dist;
+            const force = (2000 * well.strength) / (dist * dist + 100);
+            p.vx += (force * dx) / dist;
+            p.vy += (force * dy) / dist;
           }
         }
         p.x += p.vx;
@@ -188,10 +194,23 @@ const GravityWellSim: React.FC = () => {
         p.vx *= 0.97;
         p.vy *= 0.97;
         // bounce
-        if (p.x < p.r) { p.x = p.r; p.vx *= -0.8; }
-        if (p.x > WIDTH - p.r) { p.x = WIDTH - p.r; p.vx *= -0.8; }
-        if (p.y > HEIGHT - p.r) { p.y = HEIGHT - p.r; p.vy *= -0.7; p.vx *= 0.98; }
-        if (p.y < p.r) { p.y = p.r; p.vy *= -0.7; }
+        if (p.x < p.r) {
+          p.x = p.r;
+          p.vx *= -0.8;
+        }
+        if (p.x > WIDTH - p.r) {
+          p.x = WIDTH - p.r;
+          p.vx *= -0.8;
+        }
+        if (p.y > HEIGHT - p.r) {
+          p.y = HEIGHT - p.r;
+          p.vy *= -0.7;
+          p.vx *= 0.98;
+        }
+        if (p.y < p.r) {
+          p.y = p.r;
+          p.vy *= -0.7;
+        }
       }
       for (const p of balls) {
         ctx.beginPath();
@@ -204,7 +223,9 @@ const GravityWellSim: React.FC = () => {
       requestAnimationFrame(animate);
     }
     animate();
-    return () => { running = false; };
+    return () => {
+      running = false;
+    };
   }, [wells, balls]);
 
   // Drag logic for multiple wells
@@ -221,7 +242,7 @@ const GravityWellSim: React.FC = () => {
         const well = wells[i];
         if (Math.sqrt((x - well.x) ** 2 + (y - well.y) ** 2) < MAGNET_RADIUS + 6) {
           setDragIndex(i);
-          setWells(ws => ws.map((w, idx) => idx === i ? { ...w, dragging: true } : w));
+          setWells((ws) => ws.map((w, idx) => (idx === i ? { ...w, dragging: true } : w)));
           break;
         }
       }
@@ -232,10 +253,10 @@ const GravityWellSim: React.FC = () => {
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      setWells(ws => ws.map((w, idx) => idx === dragIndex && w.dragging ? { ...w, x, y } : w));
+      setWells((ws) => ws.map((w, idx) => (idx === dragIndex && w.dragging ? { ...w, x, y } : w)));
     }
     function onUp() {
-      setWells(ws => ws.map(w => ({ ...w, dragging: false })));
+      setWells((ws) => ws.map((w) => ({ ...w, dragging: false })));
       setDragIndex(null);
     }
     canvas.addEventListener('mousedown', onDown);
@@ -251,14 +272,58 @@ const GravityWellSim: React.FC = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <h1>🪐 Gravity Well Simulation</h1>
-      <p style={{ color: 'var(--color-text-secondary)' }}>Drag any blue gravity well to move the balls! Add more wells for more fun.</p>
+      <p style={{ color: 'var(--color-text-secondary)' }}>
+        Drag any blue gravity well to move the balls! Add more wells for more fun.
+      </p>
       <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
-        <button onClick={addWell} style={{ padding: '8px 18px', fontSize: 16, borderRadius: 8, background: '#2563eb', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600 }}>Add Gravity Well</button>
-        <button onClick={addBall} style={{ padding: '8px 18px', fontSize: 16, borderRadius: 8, background: '#ff5252', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600 }}>Add Ball</button>
+        <button
+          onClick={addWell}
+          style={{
+            padding: '8px 18px',
+            fontSize: 16,
+            borderRadius: 8,
+            background: '#2563eb',
+            color: '#fff',
+            border: 'none',
+            cursor: 'pointer',
+            fontWeight: 600,
+          }}
+        >
+          Add Gravity Well
+        </button>
+        <button
+          onClick={addBall}
+          style={{
+            padding: '8px 18px',
+            fontSize: 16,
+            borderRadius: 8,
+            background: '#ff5252',
+            color: '#fff',
+            border: 'none',
+            cursor: 'pointer',
+            fontWeight: 600,
+          }}
+        >
+          Add Ball
+        </button>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8, width: 320 }}>
+      <div
+        style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8, width: 320 }}
+      >
         {wells.map((well, idx) => (
-          <label key={idx} style={{ color: '#2563eb', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, background: '#fff2', borderRadius: 8, padding: '4px 12px' }}>
+          <label
+            key={idx}
+            style={{
+              color: '#2563eb',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              background: '#fff2',
+              borderRadius: 8,
+              padding: '4px 12px',
+            }}
+          >
             Gravity Well {idx + 1} Strength
             <input
               type="range"
@@ -266,16 +331,28 @@ const GravityWellSim: React.FC = () => {
               max="2"
               step="0.01"
               value={well.strength}
-              onChange={e => setWellStrength(idx, Number(e.target.value))}
+              onChange={(e) => setWellStrength(idx, Number(e.target.value))}
               style={{ flex: 1, accentColor: '#2563eb' }}
             />
-            <span style={{ minWidth: 40, textAlign: 'right', color: '#222', fontWeight: 700 }}>{well.strength.toFixed(2)}</span>
+            <span style={{ minWidth: 40, textAlign: 'right', color: '#222', fontWeight: 700 }}>
+              {well.strength.toFixed(2)}
+            </span>
           </label>
         ))}
       </div>
-      <canvas ref={canvasRef} width={WIDTH} height={HEIGHT} style={{ borderRadius: 16, background: 'var(--color-surface)', boxShadow: '0 2px 16px rgba(0,0,0,0.08)', margin: 16 }} />
+      <canvas
+        ref={canvasRef}
+        width={WIDTH}
+        height={HEIGHT}
+        style={{
+          borderRadius: 16,
+          background: 'var(--color-surface)',
+          boxShadow: '0 2px 16px rgba(0,0,0,0.08)',
+          margin: 16,
+        }}
+      />
     </div>
   );
 };
 
-export default GravityWellSim; 
+export default GravityWellSim;

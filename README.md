@@ -5,6 +5,7 @@ A modern web gallery for interactive experiments and mini-games, built with Next
 [![Vercel](https://vercelbadge.vercel.app/api/steven-d-pennington/experiments)](https://vercel.com/import/project?template=https://github.com/steven-d-pennington/experiments)
 
 ## Features
+
 - Responsive gallery of creative coding experiments
 - Voting system (Supabase backend)
 - Tag filtering and search
@@ -39,9 +40,11 @@ A modern web gallery for interactive experiments and mini-games, built with Next
 This project is ready for [Vercel](https://vercel.com/) deployment. Just connect your GitHub repo and set the required environment variables in the Vercel dashboard.
 
 ## Adding Experiments
+
 - Add a new experiment component in `src/experiments/`
 - Register it in `src/experiments/registry.ts`
 - Add a thumbnail to `public/thumbnails/`
 
 ## License
+
 See [LICENSE](./LICENSE).

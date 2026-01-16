@@ -18,7 +18,7 @@ This document outlines the plan to implement user authentication and management 
 1.  **Enable Google Auth Provider:**
     - In the Supabase project dashboard, navigate to **Authentication -> Providers**.
     - Enable and configure the **Google** provider using the credentials from the Google Cloud Console.
-    *Note: This step requires manual configuration in the Supabase UI.*
+      _Note: This step requires manual configuration in the Supabase UI._
 
 2.  **Create `profiles` Table:**
     - Create a new table named `profiles` to store public user data that is safe to expose to the client. This table will be linked to the private `auth.users` table.
@@ -31,13 +31,11 @@ This document outlines the plan to implement user authentication and management 
         avatar_url TEXT,
         updated_at TIMESTAMPTZ DEFAULT NOW()
       );
-
       -- Set up Row Level Security
       ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
       CREATE POLICY "Public profiles are viewable by everyone." ON public.profiles FOR SELECT USING (true);
       CREATE POLICY "Users can insert their own profile." ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
       CREATE POLICY "Users can update their own profile." ON public.profiles FOR UPDATE USING (auth.uid() = id);
-
       -- Function to create a profile for a new user
       CREATE OR REPLACE FUNCTION public.handle_new_user()
       RETURNS TRIGGER AS $$
@@ -47,7 +45,6 @@ This document outlines the plan to implement user authentication and management 
         RETURN new;
       END;
       $$ LANGUAGE plpgsql SECURITY DEFINER;
-
       -- Trigger to execute the function on new user creation
       CREATE TRIGGER on_auth_user_created
         AFTER INSERT ON auth.users
@@ -61,6 +58,7 @@ This document outlines the plan to implement user authentication and management 
 ### Phase 2: Client-Side Implementation
 
 1.  **Install Supabase Auth Helpers:**
+
     ```bash
     npm install @supabase/auth-helpers-nextjs @supabase/supabase-js
     ```

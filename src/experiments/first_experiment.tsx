@@ -113,10 +113,10 @@ const GravityBallsGame: React.FC = () => {
         // Apply impulse
         const impulseX = impulseScalar * normalX;
         const impulseY = impulseScalar * normalY;
-        a.vx -= impulseX * b.radius / totalMass;
-        a.vy -= impulseY * b.radius / totalMass;
-        b.vx += impulseX * a.radius / totalMass;
-        b.vy += impulseY * a.radius / totalMass;
+        a.vx -= (impulseX * b.radius) / totalMass;
+        a.vy -= (impulseY * b.radius) / totalMass;
+        b.vx += (impulseX * a.radius) / totalMass;
+        b.vy += (impulseY * a.radius) / totalMass;
       }
     }
 
@@ -176,22 +176,55 @@ const GravityBallsGame: React.FC = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
       <h1>🌍 Gravity Balls Game</h1>
-      <div style={{ color: 'var(--color-text)', textAlign: 'center', marginBottom: 20, fontSize: 18 }}>
-        Click anywhere on the canvas to drop balls!<br />
+      <div
+        style={{ color: 'var(--color-text)', textAlign: 'center', marginBottom: 20, fontSize: 18 }}
+      >
+        Click anywhere on the canvas to drop balls!
+        <br />
         Watch them bounce with realistic physics
       </div>
       <canvas
         ref={canvasRef}
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
-        style={{ border: '3px solid white', borderRadius: 10, boxShadow: '0 8px 32px rgba(0,0,0,0.3)', cursor: 'crosshair', background: 'var(--color-surface)' }}
+        style={{
+          border: '3px solid white',
+          borderRadius: 10,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+          cursor: 'crosshair',
+          background: 'var(--color-surface)',
+        }}
         onClick={handleCanvasClick}
       />
       <div style={{ marginTop: 15, display: 'flex', gap: 10 }}>
-        <button onClick={clearBalls} style={{ padding: '10px 20px', fontSize: 16, border: 'none', borderRadius: 5, background: '#ff6b6b', color: 'white', cursor: 'pointer', transition: 'background 0.3s' }}>
+        <button
+          onClick={clearBalls}
+          style={{
+            padding: '10px 20px',
+            fontSize: 16,
+            border: 'none',
+            borderRadius: 5,
+            background: '#ff6b6b',
+            color: 'white',
+            cursor: 'pointer',
+            transition: 'background 0.3s',
+          }}
+        >
           Clear All Balls
         </button>
-        <button onClick={toggleGravity} style={{ padding: '10px 20px', fontSize: 16, border: 'none', borderRadius: 5, background: '#6bafff', color: 'white', cursor: 'pointer', transition: 'background 0.3s' }}>
+        <button
+          onClick={toggleGravity}
+          style={{
+            padding: '10px 20px',
+            fontSize: 16,
+            border: 'none',
+            borderRadius: 5,
+            background: '#6bafff',
+            color: 'white',
+            cursor: 'pointer',
+            transition: 'background 0.3s',
+          }}
+        >
           Toggle Gravity
         </button>
       </div>
@@ -202,4 +235,4 @@ const GravityBallsGame: React.FC = () => {
   );
 };
 
-export default GravityBallsGame; 
+export default GravityBallsGame;

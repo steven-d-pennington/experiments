@@ -16,4 +16,4 @@ describe('ThemeToggle', () => {
     fireEvent.click(btn);
     expect(btn.textContent).not.toBe(initialText);
   });
-}); 
+});

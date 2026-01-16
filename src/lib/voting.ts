@@ -30,10 +30,12 @@ export async function upsertVote(experimentId: string, vote: 1 | -1, user: User 
   const deviceId = getUserDeviceId();
   if (!user && !deviceId) throw new Error('User or device ID must be available to vote.');
 
-  const { error } = await supabase.from(VOTES_TABLE).upsert([
-    { experiment_id: experimentId, vote, user_id: user?.id, device_id: deviceId },
-  ], { onConflict: user ? 'experiment_id,user_id' : 'experiment_id,device_id' });
+  const { error } = await supabase
+    .from(VOTES_TABLE)
+    .upsert([{ experiment_id: experimentId, vote, user_id: user?.id, device_id: deviceId }], {
+      onConflict: user ? 'experiment_id,user_id' : 'experiment_id,device_id',
+    });
 
   if (error) throw error;
   return fetchVotes(experimentId, user);
-} 
+}

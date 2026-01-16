@@ -11,7 +11,7 @@ const SearchInput = styled.input`
   background: var(--color-background);
   color: var(--color-text);
   margin-bottom: 1.5em;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   outline: none;
   transition: border 0.2s;
   &:focus {
@@ -40,4 +40,4 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
   );
 };
 
-export default SearchBar; 
+export default SearchBar;
